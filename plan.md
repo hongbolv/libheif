@@ -546,8 +546,10 @@ static heif_error svt_hevc_set_parameter_quality(void* encoder_raw, int quality)
 
   encoder->quality = quality;
 
-  // 映射 quality 到 QP: quality=0 -> qp=51, quality=100 -> qp=0
-  encoder->qp = (int)((100 - quality) * 51 / 100.0 + 0.5);
+  // 映射 quality 到 QP: quality=0 -> qp=MAX_QP, quality=MAX_QUALITY -> qp=0
+  static const int MAX_QP = 51;
+  static const int MAX_QUALITY = 100;
+  encoder->qp = (int)((MAX_QUALITY - quality) * MAX_QP / (double)MAX_QUALITY + 0.5);
 
   return heif_error_ok;
 }
@@ -767,7 +769,7 @@ static void parse_nal_units_from_bitstream(
 
     while (pos + 2 < bitstream_size) {
       if (bitstream[pos] == 0 && bitstream[pos + 1] == 0) {
-        if (pos + 2 < bitstream_size && bitstream[pos + 2] == 1) {
+        if (bitstream[pos + 2] == 1) {
           // 3 字节起始码
           found = true;
           break;
@@ -824,7 +826,11 @@ static void parse_nal_units_from_bitstream(
       const uint8_t* nal_data = bitstream + nal_data_start;
 
       // 跳过 "unregistered user data SEI" (类似 x265 插件的处理)
-      if (nal_size >= 3 && nal_data[0] == 0x4e && nal_data[2] == 5) {
+      // NAL type prefix SEI = 0x4e (39<<1), SEI payload type unregistered = 5
+      static const uint8_t NAL_TYPE_PREFIX_SEI_BYTE = 0x4e;
+      static const uint8_t SEI_PAYLOAD_UNREGISTERED_USER_DATA = 5;
+      if (nal_size >= 3 && nal_data[0] == NAL_TYPE_PREFIX_SEI_BYTE
+          && nal_data[2] == SEI_PAYLOAD_UNREGISTERED_USER_DATA) {
         // 跳过
       }
       else {
@@ -1248,8 +1254,8 @@ static const heif_encoder_plugin encoder_plugin_svt_hevc
         /* list_parameters */ svt_hevc_list_parameters,
         /* set_parameter_integer */ svt_hevc_set_parameter_integer,
         /* get_parameter_integer */ svt_hevc_get_parameter_integer,
-        /* set_parameter_boolean */ svt_hevc_set_parameter_integer,
-        /* get_parameter_boolean */ svt_hevc_get_parameter_integer,
+        /* set_parameter_boolean */ svt_hevc_set_parameter_integer, // boolean maps to integer (same pattern as x265)
+        /* get_parameter_boolean */ svt_hevc_get_parameter_integer, // boolean maps to integer (same pattern as x265)
         /* set_parameter_string */ svt_hevc_set_parameter_string,
         /* get_parameter_string */ svt_hevc_get_parameter_string,
         /* query_input_colorspace */ svt_hevc_query_input_colorspace,
