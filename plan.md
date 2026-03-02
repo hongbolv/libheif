@@ -34,14 +34,20 @@ SVT-HEVC (Scalable Video Technology for HEVC) 是 Intel 开源的 HEVC 编码器
 |------|-------|---------|----------------|
 | 编码格式 | HEVC | HEVC | HEVC |
 | 位深度 | 8/10/12 | 编译时固定 | 8/10 |
-| 色度采样 | 420/422/444 | 420/422/444 | 420 (主要) |
+| 色度采样 | 420/422/444 | 420/422/444 | 420/422/444 |
 | 无损编码 | ✅ | ✅ | ❌ |
 | 序列编码 | ✅ | ✅ | ✅ |
-| API 风格 | C 函数指针 | C 函数指针 | 异步回调式 |
+| API 风格 | C 函数指针 | C 函数指针 | 异步发送/接收 |
+| 分辨率范围 | 无限制 | 无限制 | 64×64 ~ 8192×4320 |
 
 ### 1.3 建议优先级
 
-由于 SVT-HEVC 主要面向高分辨率视频且不支持无损编码，建议将其优先级设置为 **90**（低于 x265 的 100），作为一个可选择的备选编码器。
+由于 SVT-HEVC 不支持无损编码，且该项目已于 2021 年停止维护（Intel 已停止对该项目的开发和贡献），建议将其优先级设置为 **90**（低于 x265 的 100），作为一个可选择的备选编码器。SVT-HEVC 的优势在于针对 Intel 处理器的高并行优化，适合追求编码速度的场景。
+
+> **注意**: SVT-HEVC 支持从 64×64 到 8192×4320 的全范围分辨率，并非仅限于高分辨率视频。编码预设范围因分辨率而异：
+> - 所有分辨率：预设 0-9
+> - ≥1080p：预设 0-10
+> - ≥4K：预设 0-11
 
 ---
 
@@ -49,19 +55,81 @@ SVT-HEVC (Scalable Video Technology for HEVC) 是 Intel 开源的 HEVC 编码器
 
 ### 2.1 核心 API 流程
 
-SVT-HEVC 的编码流程与 x265 有显著不同，采用异步模式：
+SVT-HEVC 的编码流程与 x265 有显著不同，采用异步发送/接收模式：
 
 ```
 步骤 1: EbInitHandle()       — 创建编码器句柄，获取默认配置
 步骤 2: EbH265EncSetParameter() — 设置编码参数
 步骤 3: EbInitEncoder()      — 初始化编码器
 可选:   EbH265EncStreamHeader() — 获取 VPS/SPS/PPS 头
-步骤 4: EbH265EncSendPicture() — 发送图像帧
-步骤 5: EbH265GetPacket()     — 获取编码后的数据包
+步骤 4: EbH265EncSendPicture() — 发送图像帧（可重复调用）
+步骤 5: EbH265GetPacket()     — 获取编码后的数据包（可重复调用）
 步骤 5-1: EbH265ReleaseOutBuffer() — 释放输出缓冲区
 步骤 6: EbDeinitEncoder()    — 反初始化编码器
 步骤 7: EbDeinitHandle()     — 销毁编码器句柄
 ```
+
+#### 单帧编码流程（HEIC 静态图像）
+
+```
+EbInitHandle() → 获取默认配置
+   ↓
+配置参数: framesToBeEncoded=1, intraPeriodLength=-1, hierarchicalLevels=0
+   ↓
+EbH265EncSetParameter() → 应用配置
+   ↓
+EbInitEncoder() → 初始化编码器
+   ↓
+EbH265EncStreamHeader() → 获取 VPS/SPS/PPS
+   ↓
+EbH265EncSendPicture(picture) → 发送唯一帧
+   ↓
+EbH265EncSendPicture(EOS) → 发送 EOS 空缓冲区
+   ↓
+循环 EbH265GetPacket(picSendDone=1) → 阻塞获取所有编码数据
+   ↓ (直到 EB_NoErrorEmptyQueue)
+EbDeinitEncoder() → EbDeinitHandle()
+```
+
+#### 多帧编码流程（HEIC 序列/图像组）
+
+```
+EbInitHandle() → 获取默认配置
+   ↓
+配置参数: framesToBeEncoded=0, intraPeriodLength=-2(auto), hierarchicalLevels=3
+   ↓
+EbH265EncSetParameter() → 应用配置
+   ↓
+EbInitEncoder() → 初始化编码器
+   ↓
+EbH265EncStreamHeader() → 获取 VPS/SPS/PPS (解析为 NAL 单元存入输出队列)
+   ↓
+┌─ 对每一帧 (frame 0, 1, 2, ...):
+│    ↓
+│    EbH265EncSendPicture(picture, nFlags=0) → 发送帧
+│    ↓
+│    循环 EbH265GetPacket(picSendDone=0) → 非阻塞获取已有数据
+│    │  ↓ (解析 Annex B NAL, 存入输出队列)
+│    │  EbH265ReleaseOutBuffer() → 释放输出缓冲区
+│    └─ 直到 EB_NoErrorEmptyQueue
+│
+└─ 所有帧发送完毕后:
+     ↓
+     EbH265EncSendPicture(EOS) → 发送 EOS 空缓冲区 (pBuffer=NULL, nFlags=EB_BUFFERFLAG_EOS)
+     ↓
+     循环 EbH265GetPacket(picSendDone=1) → 阻塞获取剩余编码数据
+     │  ↓ (解析 Annex B NAL, 存入输出队列)
+     │  EbH265ReleaseOutBuffer()
+     └─ 直到 EB_NoErrorEmptyQueue
+     ↓
+     EbDeinitEncoder() → EbDeinitHandle()
+```
+
+**关键说明**:
+- `picSendDone=0`: 非阻塞模式，立即返回可用数据或 `EB_NoErrorEmptyQueue`
+- `picSendDone=1`: 阻塞模式，等待直到数据可用或队列为空（用于最终刷新）
+- EOS 通过一个 **单独的空缓冲区** 发送，与最后一帧分开（参考 SVT-HEVC 官方应用的实现）
+- 由于 SVT-HEVC 的流水线设计，发送帧和接收编码结果之间存在延迟，因此异步模型是必要的
 
 ### 2.2 关键数据结构
 
@@ -122,12 +190,13 @@ typedef enum EB_COLOR_FORMAT {
 
 ### 2.3 关键注意事项
 
-1. **异步 API**: SVT-HEVC 使用发送/接收模式，`EbH265EncSendPicture()` 发送帧，`EbH265GetPacket()` 异步获取编码结果
+1. **异步 API**: SVT-HEVC 使用发送/接收模式，`EbH265EncSendPicture()` 发送帧，`EbH265GetPacket()` 异步获取编码结果。`picSendDone` 参数控制阻塞行为：0=非阻塞，1=阻塞等待
 2. **内存管理**: 输出缓冲区需要通过 `EbH265ReleaseOutBuffer()` 释放
-3. **10位输入**: 支持 packed 和 unpacked 两种 10 位输入格式
-4. **色度格式**: 主要支持 4:2:0，4:2:2 和 4:4:4 支持有限
-5. **无损编码**: SVT-HEVC **不支持** 无损编码
-6. **最小图像尺寸**: 需要确认，可能需要 64x64 最小尺寸
+3. **10位输入**: 支持 packed (16-bit per sample) 和 unpacked (8-bit + 2-bit 分离平面) 两种 10 位输入格式。unpacked 格式使用 `lumaExt`/`cbExt`/`crExt` 字段存储额外 2 位
+4. **色度格式**: 支持 4:2:0 (`EB_YUV420`, 默认)、4:2:2 (`EB_YUV422`)、4:4:4 (`EB_YUV444`) 三种格式。注意 HEVC Main/Main10 profile 只支持 4:2:0，使用 4:2:2/4:4:4 可能需要编码器内部自动调整 profile
+5. **无损编码**: SVT-HEVC **不支持** 无损编码。其 API 中没有无损模式的参数，rate control 仅支持 CQP (QP=0~51) 和 VBR 两种模式，即使 QP=0 也仍然是有损编码
+6. **图像尺寸**: 支持 64×64 到 8192×4320 的分辨率范围，宽高不是 8 的倍数时会自动填充 (padding)
+7. **EOS 处理**: 编码结束时需要发送一个单独的 EOS 缓冲区（`pBuffer=NULL`, `nFlags=EB_BUFFERFLAG_EOS`），编码器收到 EOS 后将刷新所有剩余的编码数据
 
 ---
 
@@ -721,7 +790,7 @@ static void svt_hevc_set_default_parameters(void* encoder)
 
 static void svt_hevc_query_input_colorspace(heif_colorspace* colorspace, heif_chroma* chroma)
 {
-  // SVT-HEVC 主要支持 YCbCr 4:2:0
+  // SVT-HEVC 支持 YCbCr 4:2:0/4:2:2/4:4:4，默认使用 4:2:0
   if (*colorspace == heif_colorspace_monochrome) {
     *colorspace = heif_colorspace_monochrome;
     *chroma = heif_chroma_monochrome;
@@ -737,7 +806,7 @@ static void svt_hevc_query_input_colorspace2(void* encoder_raw,
                                               heif_colorspace* colorspace,
                                               heif_chroma* chroma)
 {
-  // SVT-HEVC 主要支持 YCbCr 4:2:0
+  // SVT-HEVC 支持 YCbCr 4:2:0/4:2:2/4:4:4，默认使用 4:2:0
   if (*colorspace == heif_colorspace_monochrome) {
     *colorspace = heif_colorspace_monochrome;
     *chroma = heif_chroma_monochrome;
@@ -1033,9 +1102,12 @@ static heif_error svt_hevc_encode_frame(encoder_struct_svt_hevc* encoder,
   input_buffer.pBuffer = (uint8_t*) &input_pic;
   input_buffer.nAllocLen = sizeof(EB_H265_ENC_INPUT);
   input_buffer.nFilledLen = sizeof(EB_H265_ENC_INPUT);
-  input_buffer.nFlags = is_last_frame ? EB_BUFFERFLAG_EOS : 0;
+  // 注意: 不在图像帧上设置 EOS 标记
+  // EOS 通过单独的空缓冲区发送（与 SVT-HEVC 参考应用一致）
+  input_buffer.nFlags = 0;
   input_buffer.pts = frame_nr;
   input_buffer.pAppPrivate = reinterpret_cast<void*>(frame_nr);
+  input_buffer.sliceType = EB_INVALID_PICTURE;
 
   // 发送帧
   EB_ERRORTYPE eb_err = EbH265EncSendPicture(encoder->svt_encoder, &input_buffer);
@@ -1047,12 +1119,11 @@ static heif_error svt_hevc_encode_frame(encoder_struct_svt_hevc* encoder,
     };
   }
 
-  // 接收编码结果
+  // 非阻塞获取可用的编码结果
   EB_BUFFERHEADERTYPE* output_buffer = nullptr;
-  uint8_t pic_send_done = is_last_frame ? 1 : 0;
 
   for (;;) {
-    eb_err = EbH265GetPacket(encoder->svt_encoder, &output_buffer, pic_send_done);
+    eb_err = EbH265GetPacket(encoder->svt_encoder, &output_buffer, 0);
 
     if (eb_err == EB_NoErrorEmptyQueue) {
       break;
@@ -1093,11 +1164,48 @@ static heif_error svt_hevc_encode_image(void* encoder_raw, const heif_image* ima
     return err;
   }
 
-  // 编码单帧 (标记为最后一帧)
-  err = svt_hevc_encode_frame(encoder, image, 0, true);
+  // 编码单帧 (不标记 EOS，与参考应用一致)
+  err = svt_hevc_encode_frame(encoder, image, 0, false);
   if (err.code) {
     return err;
   }
+
+  // 发送单独的 EOS 缓冲区（与 SVT-HEVC 参考应用 ProcessInputBuffer 的做法一致）
+  EB_BUFFERHEADERTYPE eos_buffer;
+  memset(&eos_buffer, 0, sizeof(eos_buffer));
+  eos_buffer.nSize = sizeof(EB_BUFFERHEADERTYPE);
+  eos_buffer.nFlags = EB_BUFFERFLAG_EOS;
+  eos_buffer.pBuffer = nullptr;
+  eos_buffer.nFilledLen = 0;
+  eos_buffer.nAllocLen = 0;
+  eos_buffer.sliceType = EB_INVALID_PICTURE;
+
+  EbH265EncSendPicture(encoder->svt_encoder, &eos_buffer);
+
+  // 阻塞获取所有编码数据
+  EB_BUFFERHEADERTYPE* output_buffer = nullptr;
+  for (;;) {
+    EB_ERRORTYPE eb_err = EbH265GetPacket(encoder->svt_encoder, &output_buffer, 1);
+
+    if (eb_err == EB_NoErrorEmptyQueue || eb_err != EB_ErrorNone) {
+      break;
+    }
+
+    if (output_buffer && output_buffer->nFilledLen > 0) {
+      uintptr_t out_frame_nr = reinterpret_cast<uintptr_t>(output_buffer->pAppPrivate);
+      parse_nal_units_from_bitstream(
+          output_buffer->pBuffer, output_buffer->nFilledLen,
+          encoder->output_packets, out_frame_nr);
+    }
+
+    if (output_buffer) {
+      EbH265ReleaseOutBuffer(&output_buffer);
+    }
+  }
+
+  // 清理编码器
+  EbDeinitEncoder(encoder->svt_encoder);
+  encoder->encoder_initialized = false;
 
   return heif_error_ok;
 }
@@ -1144,17 +1252,20 @@ static heif_error svt_hevc_end_sequence_encoding(void* encoder_raw)
     return heif_error_ok;
   }
 
-  // 发送 EOS 标记以刷新编码器
+  // 发送 EOS 标记以刷新编码器（与 SVT-HEVC 参考应用 ProcessInputBuffer 一致）
   EB_BUFFERHEADERTYPE eos_buffer;
   memset(&eos_buffer, 0, sizeof(eos_buffer));
   eos_buffer.nSize = sizeof(EB_BUFFERHEADERTYPE);
   eos_buffer.nFlags = EB_BUFFERFLAG_EOS;
   eos_buffer.pBuffer = nullptr;
   eos_buffer.nFilledLen = 0;
+  eos_buffer.nAllocLen = 0;
+  eos_buffer.pAppPrivate = nullptr;
+  eos_buffer.sliceType = EB_INVALID_PICTURE;
 
   EbH265EncSendPicture(encoder->svt_encoder, &eos_buffer);
 
-  // 获取剩余的编码数据
+  // 阻塞获取所有剩余的编码数据 (picSendDone=1)
   EB_BUFFERHEADERTYPE* output_buffer = nullptr;
   for (;;) {
     EB_ERRORTYPE eb_err = EbH265GetPacket(encoder->svt_encoder, &output_buffer, 1);
@@ -1356,29 +1467,34 @@ heif_encoder_set_parameter(encoder, name, value);
 ### 7.1 SVT-HEVC 与 x265 的关键差异
 
 1. **异步 API 模型**:
-   - x265 使用同步 `encoder_encode()` 调用
-   - SVT-HEVC 使用异步 `EbH265EncSendPicture()` + `EbH265GetPacket()` 模式
-   - **影响**: 编码和获取数据的时序需要特殊处理
+   - x265 使用同步 `encoder_encode()` 调用，发送帧后立即返回编码结果
+   - SVT-HEVC 使用异步 `EbH265EncSendPicture()` + `EbH265GetPacket()` 模式，发送和接收之间存在流水线延迟
+   - **影响**: 编码和获取数据的时序需要特殊处理，需要在 `encode_image()` 中先发送帧再循环获取所有结果
 
 2. **NAL 输出格式**:
-   - x265 直接返回 `x265_nal` 结构体数组
-   - SVT-HEVC 返回 Annex B 格式的比特流（带 0x00000001 起始码）
-   - **影响**: 需要实现 `parse_nal_units_from_bitstream()` 函数来解析
+   - x265 直接返回 `x265_nal` 结构体数组，每个 NAL 独立
+   - SVT-HEVC 返回 Annex B 格式的比特流（带 0x00000001 起始码），多个 NAL 合并在一个缓冲区中
+   - **影响**: 需要实现 `parse_nal_units_from_bitstream()` 函数来拆分
 
 3. **无损编码**:
    - x265 支持无损编码 (`bLossless = 1`)
-   - SVT-HEVC **不支持** 无损编码
+   - SVT-HEVC **不支持** 无损编码（API 中无此参数，CQP 模式下 QP=0 仍为有损）
    - **影响**: `supports_lossless_compression` 设为 `false`，`set_parameter_lossless(true)` 返回错误
 
 4. **色度格式支持**:
    - x265 支持 4:2:0、4:2:2、4:4:4
-   - SVT-HEVC 主要支持 4:2:0
-   - **影响**: `query_input_colorspace()` 始终返回 `heif_chroma_420`
+   - SVT-HEVC 也支持 4:2:0、4:2:2、4:4:4（通过 `encoderColorFormat` 参数），默认为 4:2:0
+   - **影响**: `query_input_colorspace()` 可根据配置返回对应的色度格式，默认使用 `heif_chroma_420`
 
 5. **位深度**:
    - x265 支持 8/10/12 位
    - SVT-HEVC 仅支持 8 和 10 位
    - **影响**: 12 位输入需要返回错误
+
+6. **EOS 处理**:
+   - x265 通过传入 NULL 帧触发刷新
+   - SVT-HEVC 需要发送一个单独的 EOS 缓冲区（`pBuffer=NULL`, `nFlags=EB_BUFFERFLAG_EOS`）
+   - **影响**: `end_sequence_encoding()` 中需要发送 EOS 缓冲区并阻塞获取所有剩余数据
 
 ### 7.2 编码器初始化时机
 
@@ -1401,18 +1517,20 @@ heif_encoder_set_parameter(encoder, name, value);
 
 SVT-HEVC 设计为视频编码器，用于静态图像（单帧）编码需要特殊配置：
 - `intraPeriodLength = -1` (无周期性 I 帧)
-- `hierarchicalLevels = 0` (无层次结构)
+- `hierarchicalLevels = 0` (无层次结构，Flat 模式)
+- `predStructure = 2` (Random Access，与单帧无关但需要有效值)
 - `framesToBeEncoded = 1` (仅 1 帧)
-- 发送帧时立即设置 `EB_BUFFERFLAG_EOS`
+- `frameRate = 1` (最低帧率)
+- 发送帧后紧接着发送一个 **单独的 EOS 缓冲区**（`pBuffer=NULL`, `nFlags=EB_BUFFERFLAG_EOS`），与 SVT-HEVC 参考应用的做法一致
+- 使用 `EbH265GetPacket(handle, &output, picSendDone=1)` 阻塞等待编码完成
 
 ### 7.5 图像尺寸要求
 
-SVT-HEVC 对图像尺寸有要求：
-- 最小尺寸可能需要 64x64（LCU 大小）
-- 宽度和高度需要满足编码器的对齐要求
-- 如果使用 4:2:0，宽高应为偶数
-
-建议在 `svt_hevc_init_encoder()` 中使用 `heif_image_extend_padding_to_size()` 处理对齐。
+SVT-HEVC 对图像尺寸有明确要求（来自官方文档）：
+- **最小尺寸**: 64×64 像素
+- **最大尺寸**: 8192×4320 像素
+- **对齐要求**: 宽度和高度不是 8 的倍数时，SVT-HEVC 会自动进行 padding
+- 如果使用 4:2:0，宽高应为偶数（libheif 的色彩空间转换会处理）
 
 ### 7.6 SVT-HEVC 库的可用性
 
@@ -1420,7 +1538,7 @@ SVT-HEVC 对图像尺寸有要求：
 - pkg-config 名称: `SvtHevcEnc`
 - 头文件: `EbApi.h`（位于 `svt-hevc/` 或 `EbApi.h`）
 - 库文件: `libSvtHevcEnc.so` / `SvtHevcEnc.lib`
-- **注意**: SVT-HEVC 项目已不再积极维护（最后更新约 2021 年），但仍然可用
+- **注意**: SVT-HEVC 项目已于 2021 年由 Intel 宣布停止维护（DISCONTINUATION OF PROJECT），但代码仍然可用且功能完整。对于需要高并行 HEVC 编码的场景，它仍然是一个有价值的选择
 
 ### 7.7 与 SVT-AV1 插件的命名冲突
 
