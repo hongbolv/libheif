@@ -1107,6 +1107,7 @@ static heif_error svt_hevc_encode_frame(encoder_struct_svt_hevc* encoder,
   input_buffer.nFlags = 0;
   input_buffer.pts = frame_nr;
   input_buffer.pAppPrivate = reinterpret_cast<void*>(frame_nr);
+  // EB_INVALID_PICTURE 表示由编码器自动决定 slice 类型
   input_buffer.sliceType = EB_INVALID_PICTURE;
 
   // 发送帧
@@ -1178,16 +1179,26 @@ static heif_error svt_hevc_encode_image(void* encoder_raw, const heif_image* ima
   eos_buffer.pBuffer = nullptr;
   eos_buffer.nFilledLen = 0;
   eos_buffer.nAllocLen = 0;
+  // EB_INVALID_PICTURE 表示由编码器自动决定 slice 类型（与参考应用一致）
   eos_buffer.sliceType = EB_INVALID_PICTURE;
 
-  EbH265EncSendPicture(encoder->svt_encoder, &eos_buffer);
+  EB_ERRORTYPE eos_err = EbH265EncSendPicture(encoder->svt_encoder, &eos_buffer);
+  if (eos_err != EB_ErrorNone) {
+    EbDeinitEncoder(encoder->svt_encoder);
+    encoder->encoder_initialized = false;
+    return {
+        heif_error_Encoder_plugin_error,
+        heif_suberror_Unspecified,
+        kError_encode_failed
+    };
+  }
 
   // 阻塞获取所有编码数据
   EB_BUFFERHEADERTYPE* output_buffer = nullptr;
   for (;;) {
     EB_ERRORTYPE eb_err = EbH265GetPacket(encoder->svt_encoder, &output_buffer, 1);
 
-    if (eb_err == EB_NoErrorEmptyQueue || eb_err != EB_ErrorNone) {
+    if (eb_err != EB_ErrorNone) {
       break;
     }
 
@@ -1261,16 +1272,26 @@ static heif_error svt_hevc_end_sequence_encoding(void* encoder_raw)
   eos_buffer.nFilledLen = 0;
   eos_buffer.nAllocLen = 0;
   eos_buffer.pAppPrivate = nullptr;
+  // EB_INVALID_PICTURE 表示由编码器自动决定 slice 类型（与参考应用一致）
   eos_buffer.sliceType = EB_INVALID_PICTURE;
 
-  EbH265EncSendPicture(encoder->svt_encoder, &eos_buffer);
+  EB_ERRORTYPE eos_err = EbH265EncSendPicture(encoder->svt_encoder, &eos_buffer);
+  if (eos_err != EB_ErrorNone) {
+    EbDeinitEncoder(encoder->svt_encoder);
+    encoder->encoder_initialized = false;
+    return {
+        heif_error_Encoder_plugin_error,
+        heif_suberror_Unspecified,
+        kError_encode_failed
+    };
+  }
 
   // 阻塞获取所有剩余的编码数据 (picSendDone=1)
   EB_BUFFERHEADERTYPE* output_buffer = nullptr;
   for (;;) {
     EB_ERRORTYPE eb_err = EbH265GetPacket(encoder->svt_encoder, &output_buffer, 1);
 
-    if (eb_err == EB_NoErrorEmptyQueue || eb_err != EB_ErrorNone) {
+    if (eb_err != EB_ErrorNone) {
       break;
     }
 
