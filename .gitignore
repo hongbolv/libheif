@@ -4,6 +4,7 @@
 build
 build-*
 _build
+_codeql_build_dir
 buildjs
 CMakeUserPresets.json
 third-party/SVT-AV1/
