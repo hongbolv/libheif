@@ -602,7 +602,7 @@ static heif_error svt_hevc_init_encoder(encoder_struct_svt_hevc* encoder,
   config->sourceHeight = height;
   config->encoderBitDepth = bit_depth;
   config->encoderColorFormat = EB_YUV420;
-  config->encMode = encoder->enc_preset;
+  config->encMode = static_cast<uint8_t>(encoder->enc_preset);
   config->qp = encoder->qp;
   config->rateControlMode = 0;  // CQP mode
   config->threadCount = encoder->threads;
