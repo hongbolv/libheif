@@ -177,7 +177,7 @@ For each codec, there are two configuration variables:
 * `WITH_{codec}_PLUGIN`: when enabled, the codec is compiled as a separate plugin.
 
 In order to use dynamic plugins, also make sure that `ENABLE_PLUGIN_LOADING` is enabled.
-The placeholder `{codec}` can have these values: `LIBDE265`, `X265`, `AOM_DECODER`, `AOM_ENCODER`, `SvtEnc`, `DAV1D`, `OpenH264`, `X264`, `FFMPEG_DECODER`, `JPEG_DECODER`, `JPEG_ENCODER`, `KVAZAAR`, `OpenJPEG_DECODER`, `OpenJPEG_ENCODER`, `OPENJPH_ENCODER`, `VVDEC`, `VVENC`, `UVG266`, `WEBCODECS`.
+The placeholder `{codec}` can have these values: `LIBDE265`, `X265`, `AOM_DECODER`, `AOM_ENCODER`, `SvtEnc`, `SvtHevcEnc`, `DAV1D`, `OpenH264`, `X264`, `FFMPEG_DECODER`, `JPEG_DECODER`, `JPEG_ENCODER`, `KVAZAAR`, `OpenJPEG_DECODER`, `OpenJPEG_ENCODER`, `OPENJPH_ENCODER`, `VVDEC`, `VVENC`, `UVG266`, `WEBCODECS`.
 
 Further options are:
 
