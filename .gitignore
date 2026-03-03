@@ -2,6 +2,7 @@
 # see here: https://stackoverflow.com/questions/7335420/global-git-ignore
 
 build
+build-*
 _build
 buildjs
 CMakeUserPresets.json

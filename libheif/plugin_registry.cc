@@ -41,6 +41,10 @@
 #include "plugins/encoder_kvazaar.h"
 #endif
 
+#if HAVE_SvtHevcEnc
+#include "plugins/encoder_svt_hevc.h"
+#endif
+
 #if HAVE_UVG266
 #include "plugins/encoder_uvg266.h"
 #endif
@@ -161,6 +165,10 @@ void register_default_plugins()
 
 #if HAVE_KVAZAAR
   register_encoder(get_encoder_plugin_kvazaar());
+#endif
+
+#if HAVE_SvtHevcEnc
+  register_encoder(get_encoder_plugin_svt_hevc());
 #endif
 
 #if HAVE_UVG266

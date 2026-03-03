@@ -154,6 +154,13 @@ if (WITH_KVAZAAR)
     endif ()
 endif ()
 
+# svt-hevc
+
+plugin_option(SvtHevcEnc "SVT-HEVC encoder" OFF ON)
+if (WITH_SvtHevcEnc)
+    find_package(SvtHevcEnc)
+endif ()
+
 # uvg266
 
 plugin_option(UVG266 "uvg266 VVC encoder" OFF OFF)
@@ -314,6 +321,7 @@ plugin_compilation_info(FFMPEG_DECODER FFMPEG_avcodec "FFMPEG HEVC decoder (HW a
 plugin_compilation_info(WEBCODECS WEBCODECS "WebCodecs HEVC decoder (experimental)")
 plugin_compilation_info(X265 X265 "x265 HEVC encoder")
 plugin_compilation_info(KVAZAAR KVAZAAR "Kvazaar HEVC encoder")
+plugin_compilation_info(SvtHevcEnc SvtHevcEnc "SVT-HEVC encoder")
 plugin_compilation_info(AOM_DECODER AOM_DECODER "AOM AV1 decoder")
 plugin_compilation_info(AOM_ENCODER AOM_ENCODER "AOM AV1 encoder")
 plugin_compilation_info(DAV1D DAV1D "Dav1d AV1 decoder")
@@ -358,7 +366,7 @@ endmacro()
 if (LIBDE265_FOUND OR FFMPEG_avcodec_FOUND OR WITH_WEBCODECS)
     set(SUPPORTS_HEIC_DECODING TRUE)
 endif()
-if (X265_FOUND OR KVAZAAR_FOUND)
+if (X265_FOUND OR KVAZAAR_FOUND OR SvtHevcEnc_FOUND)
     set(SUPPORTS_HEIC_ENCODING TRUE)
 endif()
 if (AOM_DECODER_FOUND OR DAV1D_FOUND)
@@ -460,6 +468,9 @@ if (X265_FOUND AND NOT (PLUGIN_LOADING_SUPPORTED_AND_ENABLED AND WITH_X265_PLUGI
 endif()
 if (KVAZAAR_FOUND AND NOT (PLUGIN_LOADING_SUPPORTED_AND_ENABLED AND WITH_KVAZAAR_PLUGIN))
     list(APPEND REQUIRES_PRIVATE "kvazaar")
+endif()
+if (SvtHevcEnc_FOUND AND NOT (PLUGIN_LOADING_SUPPORTED_AND_ENABLED AND WITH_SvtHevcEnc_PLUGIN))
+    list(APPEND REQUIRES_PRIVATE "SvtHevcEnc")
 endif()
 if (OpenH264_FOUND AND (WITH_OpenH264_DECODER AND NOT (PLUGIN_LOADING_SUPPORTED_AND_ENABLED AND WITH_OpenH264_DECODER_PLUGIN)))
     list(APPEND REQUIRES_PRIVATE "openh264")
