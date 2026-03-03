@@ -1,1 +1,0 @@
-/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/heif-dec.dir/link.d "CMakeFiles/heif-dec.dir/heif_dec.cc.o" "CMakeFiles/heif-dec.dir/common.cc.o" -o heif-dec  -Wl,-rpath,/home/runner/work/libheif/libheif/_codeql_build_dir/libheif: ../heifio/libheifio.a ../libheif/libheif.so.1.21.2
