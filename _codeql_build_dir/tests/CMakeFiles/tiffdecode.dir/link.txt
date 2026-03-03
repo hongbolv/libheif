@@ -1,0 +1,1 @@
+/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/tiffdecode.dir/link.d CMakeFiles/tiffdecode.dir/main.cc.o CMakeFiles/tiffdecode.dir/tiffdecode.cc.o -o tiffdecode  -Wl,-rpath,/home/runner/work/libheif/libheif/_codeql_build_dir/libheif ../heifio/libheifio.a libtestframework.a ../libheif/libheif.so.1.21.2
