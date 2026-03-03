@@ -34,7 +34,7 @@ libheif has support for:
 Supported codecs:
 | Format       |  Decoders           |  Encoders                    |
 |:-------------|:-------------------:|:----------------------------:|
-| HEIC         | libde265, ffmpeg    | x265, kvazaar                |
+| HEIC         | libde265, ffmpeg    | x265, kvazaar, svt-hevc      |
 | AVIF         | libaom, dav1d       | libaom, rav1e, svt-av1       |
 | VVC          | vvdec               | vvenc, uvg266                |
 | AVC          | openh264, ffmpeg    | x264                         |
@@ -274,6 +274,33 @@ You have to enable SVT-AV1 with CMake.
 When running `cmake`, make sure that the environment variable
 `PKG_CONFIG_PATH` includes the absolute path to `third-party/SVT-AV1/Build/linux/install/lib/pkgconfig`.
 You may have to replace `linux` in this path with your system's identifier.
+
+### Adding SVT-HEVC encoder for HEIC
+
+You can use the SVT-HEVC encoder libraries installed in the system or compile [SVT-HEVC](https://github.com/OpenVisualCloud/SVT-HEVC) from source:
+
+```sh
+git clone https://github.com/OpenVisualCloud/SVT-HEVC.git
+cd SVT-HEVC/Build/linux
+./build.sh release
+sudo make -C Release install
+```
+
+You have to enable SVT-HEVC explicitly with CMake:
+
+```sh
+cmake -DWITH_SvtHevcEnc=ON ..
+```
+
+When running `cmake`, make sure that the environment variable
+`PKG_CONFIG_PATH` includes the path to the SVT-HEVC pkgconfig directory (e.g. `/usr/local/lib/pkgconfig`).
+
+Example encoding with SVT-HEVC:
+
+```sh
+./heif-enc -e svt-hevc -q 80 -o output.heic input.png
+./heif-enc -e svt-hevc -p preset=3 -p qp=28 -o output.heic input.png
+```
 
 ## Codec plugins
 
