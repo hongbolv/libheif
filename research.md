@@ -250,7 +250,7 @@ Internal EbPictureBufferDesc_t (Y plane):
 └──────────────────────────────────────────────────────────┘
 
 stride = width + leftPadding + rightPadding = width + 136
-Pixel at (x,y) = bufferY[originY * stride + originX + y * stride + x]
+Pixel at (x,y) = bufferY[(originY + y) * stride + (originX + x)]
 ```
 
 Where `MAX_LCU_SIZE = 64` and padding = `MAX_LCU_SIZE + 4 = 68` pixels on each side.
