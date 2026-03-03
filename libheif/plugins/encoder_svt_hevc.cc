@@ -817,6 +817,8 @@ static heif_error svt_hevc_flush_encoder(encoder_struct_svt_hevc* encoder)
       break;
     }
 
+    bool is_eos = (output_buffer && (output_buffer->nFlags & EB_BUFFERFLAG_EOS));
+
     if (output_buffer && output_buffer->nFilledLen > 0) {
       uintptr_t frame_nr = reinterpret_cast<uintptr_t>(output_buffer->pAppPrivate);
       parse_nal_units_from_bitstream(
@@ -826,6 +828,10 @@ static heif_error svt_hevc_flush_encoder(encoder_struct_svt_hevc* encoder)
 
     if (output_buffer) {
       EbH265ReleaseOutBuffer(&output_buffer);
+    }
+
+    if (is_eos) {
+      break;
     }
   }
 

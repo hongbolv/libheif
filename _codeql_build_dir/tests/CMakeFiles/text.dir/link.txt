@@ -1,0 +1,1 @@
+/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/text.dir/link.d CMakeFiles/text.dir/text.cc.o -o text  -Wl,-rpath,/home/runner/work/libheif/libheif/_codeql_build_dir/libheif libtestframework.a ../libheif/libheif.so.1.21.2

@@ -1,0 +1,722 @@
+[
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/heifio",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heifio.dir/decoder_y4m.cc.o -c /home/runner/work/libheif/libheif/heifio/decoder_y4m.cc",
+  "file": "/home/runner/work/libheif/libheif/heifio/decoder_y4m.cc",
+  "output": "heifio/CMakeFiles/heifio.dir/decoder_y4m.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/heifio",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heifio.dir/encoder.cc.o -c /home/runner/work/libheif/libheif/heifio/encoder.cc",
+  "file": "/home/runner/work/libheif/libheif/heifio/encoder.cc",
+  "output": "heifio/CMakeFiles/heifio.dir/encoder.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/heifio",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heifio.dir/encoder_y4m.cc.o -c /home/runner/work/libheif/libheif/heifio/encoder_y4m.cc",
+  "file": "/home/runner/work/libheif/libheif/heifio/encoder_y4m.cc",
+  "output": "heifio/CMakeFiles/heifio.dir/encoder_y4m.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/heifio",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heifio.dir/exif.cc.o -c /home/runner/work/libheif/libheif/heifio/exif.cc",
+  "file": "/home/runner/work/libheif/libheif/heifio/exif.cc",
+  "output": "heifio/CMakeFiles/heifio.dir/exif.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/heifio",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heifio.dir/stubs.cc.o -c /home/runner/work/libheif/libheif/heifio/stubs.cc",
+  "file": "/home/runner/work/libheif/libheif/heifio/stubs.cc",
+  "output": "heifio/CMakeFiles/heifio.dir/stubs.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-info.dir/heif_info.cc.o -c /home/runner/work/libheif/libheif/examples/heif_info.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/heif_info.cc",
+  "output": "examples/CMakeFiles/heif-info.dir/heif_info.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-info.dir/common.cc.o -c /home/runner/work/libheif/libheif/examples/common.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/common.cc",
+  "output": "examples/CMakeFiles/heif-info.dir/common.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-dec.dir/heif_dec.cc.o -c /home/runner/work/libheif/libheif/examples/heif_dec.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/heif_dec.cc",
+  "output": "examples/CMakeFiles/heif-dec.dir/heif_dec.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-dec.dir/common.cc.o -c /home/runner/work/libheif/libheif/examples/common.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/common.cc",
+  "output": "examples/CMakeFiles/heif-dec.dir/common.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-enc.dir/heif_enc.cc.o -c /home/runner/work/libheif/libheif/examples/heif_enc.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/heif_enc.cc",
+  "output": "examples/CMakeFiles/heif-enc.dir/heif_enc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-enc.dir/benchmark.cc.o -c /home/runner/work/libheif/libheif/examples/benchmark.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/benchmark.cc",
+  "output": "examples/CMakeFiles/heif-enc.dir/benchmark.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-enc.dir/common.cc.o -c /home/runner/work/libheif/libheif/examples/common.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/common.cc",
+  "output": "examples/CMakeFiles/heif-enc.dir/common.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-enc.dir/SAI_datafile.cc.o -c /home/runner/work/libheif/libheif/examples/SAI_datafile.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/SAI_datafile.cc",
+  "output": "examples/CMakeFiles/heif-enc.dir/SAI_datafile.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-test.dir/heif_test.cc.o -c /home/runner/work/libheif/libheif/examples/heif_test.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/heif_test.cc",
+  "output": "examples/CMakeFiles/heif-test.dir/heif_test.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/examples",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif-test.dir/common.cc.o -c /home/runner/work/libheif/libheif/examples/common.cc",
+  "file": "/home/runner/work/libheif/libheif/examples/common.cc",
+  "output": "examples/CMakeFiles/heif-test.dir/common.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/testframework.dir/__/generated/test-config.cc.o -c /home/runner/work/libheif/libheif/_codeql_build_dir/generated/test-config.cc",
+  "file": "/home/runner/work/libheif/libheif/_codeql_build_dir/generated/test-config.cc",
+  "output": "tests/CMakeFiles/testframework.dir/__/generated/test-config.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/testframework.dir/test_utils.cc.o -c /home/runner/work/libheif/libheif/tests/test_utils.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/test_utils.cc",
+  "output": "tests/CMakeFiles/testframework.dir/test_utils.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -Wno-conversion -o CMakeFiles/testframework.dir/catch_amalgamated.cpp.o -c /home/runner/work/libheif/libheif/tests/catch_amalgamated.cpp",
+  "file": "/home/runner/work/libheif/libheif/tests/catch_amalgamated.cpp",
+  "output": "tests/CMakeFiles/testframework.dir/catch_amalgamated.cpp.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/encode.dir/encode.cc.o -c /home/runner/work/libheif/libheif/tests/encode.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/encode.cc",
+  "output": "tests/CMakeFiles/encode.dir/encode.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/extended_type.dir/extended_type.cc.o -c /home/runner/work/libheif/libheif/tests/extended_type.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/extended_type.cc",
+  "output": "tests/CMakeFiles/extended_type.dir/extended_type.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/region.dir/region.cc.o -c /home/runner/work/libheif/libheif/tests/region.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/region.cc",
+  "output": "tests/CMakeFiles/region.dir/region.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/tai.dir/tai.cc.o -c /home/runner/work/libheif/libheif/tests/tai.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/tai.cc",
+  "output": "tests/CMakeFiles/tai.dir/tai.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/text.dir/text.cc.o -c /home/runner/work/libheif/libheif/tests/text.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/text.cc",
+  "output": "tests/CMakeFiles/text.dir/text.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/cxx_wrapper.dir/cxx_wrapper.cc.o -c /home/runner/work/libheif/libheif/tests/cxx_wrapper.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/cxx_wrapper.cc",
+  "output": "tests/CMakeFiles/cxx_wrapper.dir/cxx_wrapper.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/omaf.dir/omaf.cc.o -c /home/runner/work/libheif/libheif/tests/omaf.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/omaf.cc",
+  "output": "tests/CMakeFiles/omaf.dir/omaf.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/tiffdecode.dir/main.cc.o -c /home/runner/work/libheif/libheif/tests/main.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/main.cc",
+  "output": "tests/CMakeFiles/tiffdecode.dir/main.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/tests",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIE -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/tiffdecode.dir/tiffdecode.cc.o -c /home/runner/work/libheif/libheif/tests/tiffdecode.cc",
+  "file": "/home/runner/work/libheif/libheif/tests/tiffdecode.cc",
+  "output": "tests/CMakeFiles/tiffdecode.dir/tiffdecode.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/bitstream.cc.o -c /home/runner/work/libheif/libheif/libheif/bitstream.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/bitstream.cc",
+  "output": "libheif/CMakeFiles/heif.dir/bitstream.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/box.cc.o -c /home/runner/work/libheif/libheif/libheif/box.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/box.cc",
+  "output": "libheif/CMakeFiles/heif.dir/box.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/error.cc.o -c /home/runner/work/libheif/libheif/libheif/error.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/error.cc",
+  "output": "libheif/CMakeFiles/heif.dir/error.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/context.cc.o -c /home/runner/work/libheif/libheif/libheif/context.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/context.cc",
+  "output": "libheif/CMakeFiles/heif.dir/context.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/file.cc.o -c /home/runner/work/libheif/libheif/libheif/file.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/file.cc",
+  "output": "libheif/CMakeFiles/heif.dir/file.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/file_layout.cc.o -c /home/runner/work/libheif/libheif/libheif/file_layout.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/file_layout.cc",
+  "output": "libheif/CMakeFiles/heif.dir/file_layout.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/pixelimage.cc.o -c /home/runner/work/libheif/libheif/libheif/pixelimage.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/pixelimage.cc",
+  "output": "libheif/CMakeFiles/heif.dir/pixelimage.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/plugin_registry.cc.o -c /home/runner/work/libheif/libheif/libheif/plugin_registry.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/plugin_registry.cc",
+  "output": "libheif/CMakeFiles/heif.dir/plugin_registry.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/nclx.cc.o -c /home/runner/work/libheif/libheif/libheif/nclx.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/nclx.cc",
+  "output": "libheif/CMakeFiles/heif.dir/nclx.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/security_limits.cc.o -c /home/runner/work/libheif/libheif/libheif/security_limits.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/security_limits.cc",
+  "output": "libheif/CMakeFiles/heif.dir/security_limits.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/init.cc.o -c /home/runner/work/libheif/libheif/libheif/init.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/init.cc",
+  "output": "libheif/CMakeFiles/heif.dir/init.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/logging.cc.o -c /home/runner/work/libheif/libheif/libheif/logging.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/logging.cc",
+  "output": "libheif/CMakeFiles/heif.dir/logging.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/compression.cc.o -c /home/runner/work/libheif/libheif/libheif/compression.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/compression.cc",
+  "output": "libheif/CMakeFiles/heif.dir/compression.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/compression_brotli.cc.o -c /home/runner/work/libheif/libheif/libheif/compression_brotli.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/compression_brotli.cc",
+  "output": "libheif/CMakeFiles/heif.dir/compression_brotli.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/compression_zlib.cc.o -c /home/runner/work/libheif/libheif/libheif/compression_zlib.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/compression_zlib.cc",
+  "output": "libheif/CMakeFiles/heif.dir/compression_zlib.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/common_utils.cc.o -c /home/runner/work/libheif/libheif/libheif/common_utils.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/common_utils.cc",
+  "output": "libheif/CMakeFiles/heif.dir/common_utils.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/region.cc.o -c /home/runner/work/libheif/libheif/libheif/region.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/region.cc",
+  "output": "libheif/CMakeFiles/heif.dir/region.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/brands.cc.o -c /home/runner/work/libheif/libheif/libheif/brands.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/brands.cc",
+  "output": "libheif/CMakeFiles/heif.dir/brands.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/id_creator.cc.o -c /home/runner/work/libheif/libheif/libheif/id_creator.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/id_creator.cc",
+  "output": "libheif/CMakeFiles/heif.dir/id_creator.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/text.cc.o -c /home/runner/work/libheif/libheif/libheif/text.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/text.cc",
+  "output": "libheif/CMakeFiles/heif.dir/text.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_library.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_library.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_library.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_library.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_image.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_image.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_image.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_image.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_color.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_color.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_color.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_color.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_regions.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_regions.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_regions.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_regions.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_plugin.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_plugin.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_plugin.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_plugin.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_properties.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_properties.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_properties.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_properties.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_items.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_items.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_items.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_items.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_sequences.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_sequences.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_sequences.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_sequences.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_tai_timestamps.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_tai_timestamps.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_tai_timestamps.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_tai_timestamps.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_brands.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_brands.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_brands.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_brands.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_metadata.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_metadata.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_metadata.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_metadata.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_aux_images.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_aux_images.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_aux_images.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_aux_images.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_entity_groups.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_entity_groups.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_entity_groups.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_entity_groups.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_security.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_security.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_security.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_security.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_encoding.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_encoding.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_encoding.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_encoding.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_decoding.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_decoding.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_decoding.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_decoding.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_image_handle.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_image_handle.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_image_handle.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_image_handle.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_context.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_context.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_context.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_context.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_tiling.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_tiling.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_tiling.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_tiling.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_uncompressed.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_uncompressed.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_uncompressed.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_uncompressed.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/api/libheif/heif_text.cc.o -c /home/runner/work/libheif/libheif/libheif/api/libheif/heif_text.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/api/libheif/heif_text.cc",
+  "output": "libheif/CMakeFiles/heif.dir/api/libheif/heif_text.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/decoder.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/decoder.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/decoder.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/decoder.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/encoder.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/encoder.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/encoder.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/encoder.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/hevc.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/hevc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/hevc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/hevc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/hevc_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/hevc_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/hevc_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/hevc_boxes.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/hevc_dec.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/hevc_dec.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/hevc_dec.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/hevc_dec.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/hevc_enc.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/hevc_enc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/hevc_enc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/hevc_enc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/avif.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/avif.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/avif.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/avif.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/avif_enc.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/avif_enc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/avif_enc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/avif_enc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/avif_dec.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/avif_dec.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/avif_dec.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/avif_dec.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/avif_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/avif_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/avif_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/avif_boxes.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/jpeg.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/jpeg.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/jpeg.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/jpeg.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/jpeg_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/jpeg_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/jpeg_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/jpeg_boxes.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/jpeg_dec.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/jpeg_dec.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/jpeg_dec.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/jpeg_dec.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/jpeg_enc.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/jpeg_enc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/jpeg_enc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/jpeg_enc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/jpeg2000.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/jpeg2000.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/jpeg2000.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/jpeg2000.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/jpeg2000_dec.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/jpeg2000_dec.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/jpeg2000_dec.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/jpeg2000_dec.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/jpeg2000_enc.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/jpeg2000_enc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/jpeg2000_enc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/jpeg2000_enc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/jpeg2000_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/jpeg2000_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/jpeg2000_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/jpeg2000_boxes.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/vvc.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/vvc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/vvc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/vvc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/vvc_dec.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/vvc_dec.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/vvc_dec.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/vvc_dec.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/vvc_enc.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/vvc_enc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/vvc_enc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/vvc_enc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/vvc_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/vvc_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/vvc_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/vvc_boxes.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/avc.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/avc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/avc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/avc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/avc_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/avc_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/avc_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/avc_boxes.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/avc_dec.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/avc_dec.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/avc_dec.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/avc_dec.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/codecs/avc_enc.cc.o -c /home/runner/work/libheif/libheif/libheif/codecs/avc_enc.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/codecs/avc_enc.cc",
+  "output": "libheif/CMakeFiles/heif.dir/codecs/avc_enc.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/mask_image.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/mask_image.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/mask_image.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/mask_image.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/image_item.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/image_item.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/image_item.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/image_item.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/grid.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/grid.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/grid.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/grid.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/overlay.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/overlay.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/overlay.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/overlay.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/iden.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/iden.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/iden.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/iden.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/image-items/tiled.cc.o -c /home/runner/work/libheif/libheif/libheif/image-items/tiled.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/image-items/tiled.cc",
+  "output": "libheif/CMakeFiles/heif.dir/image-items/tiled.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/colorconversion.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/colorconversion.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/colorconversion.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/colorconversion.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/rgb2yuv.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/rgb2yuv.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/rgb2yuv.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/rgb2yuv.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/rgb2yuv_sharp.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/rgb2yuv_sharp.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/rgb2yuv_sharp.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/rgb2yuv_sharp.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/yuv2rgb.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/yuv2rgb.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/yuv2rgb.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/yuv2rgb.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/rgb2rgb.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/rgb2rgb.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/rgb2rgb.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/rgb2rgb.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/monochrome.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/monochrome.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/monochrome.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/monochrome.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/hdr_sdr.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/hdr_sdr.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/hdr_sdr.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/hdr_sdr.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/alpha.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/alpha.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/alpha.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/alpha.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/chroma_sampling.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/chroma_sampling.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/chroma_sampling.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/chroma_sampling.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/color-conversion/bayer_bilinear.cc.o -c /home/runner/work/libheif/libheif/libheif/color-conversion/bayer_bilinear.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/color-conversion/bayer_bilinear.cc",
+  "output": "libheif/CMakeFiles/heif.dir/color-conversion/bayer_bilinear.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/sequences/seq_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/sequences/seq_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/sequences/seq_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/sequences/seq_boxes.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/sequences/chunk.cc.o -c /home/runner/work/libheif/libheif/libheif/sequences/chunk.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/sequences/chunk.cc",
+  "output": "libheif/CMakeFiles/heif.dir/sequences/chunk.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/sequences/track.cc.o -c /home/runner/work/libheif/libheif/libheif/sequences/track.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/sequences/track.cc",
+  "output": "libheif/CMakeFiles/heif.dir/sequences/track.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/sequences/track_visual.cc.o -c /home/runner/work/libheif/libheif/libheif/sequences/track_visual.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/sequences/track_visual.cc",
+  "output": "libheif/CMakeFiles/heif.dir/sequences/track_visual.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/sequences/track_metadata.cc.o -c /home/runner/work/libheif/libheif/libheif/sequences/track_metadata.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/sequences/track_metadata.cc",
+  "output": "libheif/CMakeFiles/heif.dir/sequences/track_metadata.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/plugins_unix.cc.o -c /home/runner/work/libheif/libheif/libheif/plugins_unix.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/plugins_unix.cc",
+  "output": "libheif/CMakeFiles/heif.dir/plugins_unix.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/plugins/encoder_mask.cc.o -c /home/runner/work/libheif/libheif/libheif/plugins/encoder_mask.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/plugins/encoder_mask.cc",
+  "output": "libheif/CMakeFiles/heif.dir/plugins/encoder_mask.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/plugins/nalu_utils.cc.o -c /home/runner/work/libheif/libheif/libheif/plugins/nalu_utils.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/plugins/nalu_utils.cc",
+  "output": "libheif/CMakeFiles/heif.dir/plugins/nalu_utils.cc.o"
+},
+{
+  "directory": "/home/runner/work/libheif/libheif/_codeql_build_dir/libheif",
+  "command": "/tmp/codeql-scratch-217726bad9953c64/dbs/cpp/working/autobuild/bin/c++ -DENABLE_MULTITHREADING_SUPPORT=1 -DENABLE_PARALLEL_TILE_DECODING=1 -DENABLE_PLUGIN_LOADING=1 -DHAVE_BIT -DHAVE_UNISTD_H -DHAVE_VISIBILITY -DHEIF_WITH_OMAF=1 -DIS_BIG_ENDIAN=0 -DLIBHEIF_EXPORTS -Dheif_EXPORTS -I/home/runner/work/libheif/libheif/_codeql_build_dir -I/home/runner/work/libheif/libheif/libheif -I/home/runner/work/libheif/libheif/libheif/api -I/home/runner/work/libheif/libheif/include/libheif -I/home/runner/work/libheif/libheif/include -O3 -DNDEBUG -std=c++20 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wsign-compare -Wconversion -Wno-sign-conversion -Wno-error=conversion -Wno-error=unused-parameter -Wno-error=deprecated-declarations -o CMakeFiles/heif.dir/omaf_boxes.cc.o -c /home/runner/work/libheif/libheif/libheif/omaf_boxes.cc",
+  "file": "/home/runner/work/libheif/libheif/libheif/omaf_boxes.cc",
+  "output": "libheif/CMakeFiles/heif.dir/omaf_boxes.cc.o"
+}
+]
