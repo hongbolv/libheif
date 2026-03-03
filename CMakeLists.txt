@@ -159,9 +159,6 @@ endif ()
 plugin_option(SvtHevcEnc "SVT-HEVC encoder" OFF OFF)
 if (WITH_SvtHevcEnc)
     find_package(SvtHevcEnc)
-    message(STATUS "SvtHevcEnc_FOUND: ${SvtHevcEnc_FOUND}")
-    message(STATUS "SvtHevcEnc_INCLUDE_DIR: ${SvtHevcEnc_INCLUDE_DIR}")
-    message(STATUS "SvtHevcEnc_LIBRARIES: ${SvtHevcEnc_LIBRARIES}")
 endif ()
 
 # uvg266
