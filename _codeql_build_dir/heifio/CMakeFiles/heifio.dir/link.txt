@@ -1,0 +1,2 @@
+/usr/bin/ar qc libheifio.a CMakeFiles/heifio.dir/decoder_y4m.cc.o CMakeFiles/heifio.dir/encoder.cc.o CMakeFiles/heifio.dir/encoder_y4m.cc.o CMakeFiles/heifio.dir/exif.cc.o CMakeFiles/heifio.dir/stubs.cc.o
+/usr/bin/ranlib libheifio.a

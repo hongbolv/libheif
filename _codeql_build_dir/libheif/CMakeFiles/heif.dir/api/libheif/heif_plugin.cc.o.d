@@ -1,0 +1,40 @@
+libheif/CMakeFiles/heif.dir/api/libheif/heif_plugin.cc.o: \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_plugin.cc \
+ /usr/include/stdc-predef.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_library.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
+ /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+ /usr/include/features.h /usr/include/features-time64.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/bits/timesize.h \
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/long-double.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+ /usr/include/x86_64-linux-gnu/bits/time64.h \
+ /usr/include/x86_64-linux-gnu/bits/wchar.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
+ /home/runner/work/libheif/libheif/_codeql_build_dir/libheif/heif_version.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_error.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_image.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_color.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_brands.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_metadata.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_aux_images.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_entity_groups.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_security.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_encoding.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_context.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_uncompressed_types.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_decoding.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_image_handle.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_tiling.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_plugin.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif_sequences.h \
+ /home/runner/work/libheif/libheif/libheif/api/libheif/heif.h

@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <cstring>
+#include <cstdio>
 #include <cassert>
 #include <deque>
 #include <vector>
@@ -103,7 +104,7 @@ static const heif_encoder_parameter* svt_hevc_encoder_parameter_ptrs[MAX_NPARAME
 
 static const char* svt_hevc_plugin_name()
 {
-  strcpy(plugin_name, "SVT-HEVC encoder");
+  snprintf(plugin_name, MAX_PLUGIN_NAME_LENGTH, "SVT-HEVC encoder");
   return plugin_name;
 }
 
