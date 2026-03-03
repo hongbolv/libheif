@@ -156,7 +156,7 @@ endif ()
 
 # svt-hevc
 
-plugin_option(SvtHevcEnc "SVT-HEVC encoder" OFF ON)
+plugin_option(SvtHevcEnc "SVT-HEVC encoder" OFF OFF)
 if (WITH_SvtHevcEnc)
     find_package(SvtHevcEnc)
     message(STATUS "SvtHevcEnc_FOUND: ${SvtHevcEnc_FOUND}")
