@@ -20,6 +20,7 @@
 
 #include "codecs/decoder.h"
 
+#include <cstdio>
 #include <utility>
 #include "error.h"
 #include "context.h"
@@ -285,6 +286,12 @@ Error Decoder::require_decoder_plugin(const heif_decoding_options& options)
     m_decoder_plugin = get_decoder(get_compression_format(), options.decoder_id);
     if (!m_decoder_plugin) {
       return Error(heif_error_Plugin_loading_error, heif_suberror_No_matching_decoder_installed);
+    }
+
+    if (m_decoder_plugin->get_plugin_name) {
+      fprintf(stderr, "Using decoder: %s (id: %s)\n",
+              m_decoder_plugin->get_plugin_name(),
+              (m_decoder_plugin->plugin_api_version >= 3 && m_decoder_plugin->id_name) ? m_decoder_plugin->id_name : "unknown");
     }
 
     if (m_decoder_plugin->plugin_api_version < 5) {
