@@ -18,6 +18,7 @@ macro(plugin_compilation name varName foundName optionName defineName)
                     LIBHEIF_EXPORTS
                     HAVE_VISIBILITY)
             target_compile_definitions(heif-${name} PRIVATE PLUGIN_${defineName}=1)
+            message(STATUS "PLUGIN_${defineName} is set to 1 (dynamic plugin)")
             target_include_directories(heif-${name} PRIVATE ${PROJECT_SOURCE_DIR} ${libheif_BINARY_DIR} ${libheif_SOURCE_DIR}/libheif ${libheif_SOURCE_DIR}/libheif/api ${${varName}_INCLUDE_DIRS})
             target_link_libraries(heif-${name} PRIVATE ${${varName}_LIBRARIES} heif)
 
