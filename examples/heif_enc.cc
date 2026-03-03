@@ -1780,6 +1780,9 @@ int main(int argc, char** argv)
     }
 
     active_encoder_descriptor = encoder_descriptors[idx];
+
+    std::cerr << "Using encoder: " << heif_encoder_descriptor_get_name(active_encoder_descriptor)
+              << " (id: " << heif_encoder_descriptor_get_id_name(active_encoder_descriptor) << ")\n";
   }
   else {
     std::cerr << "No " << get_compression_format_name(compressionFormat) << " encoder available.\n";

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtestframework.a "CMakeFiles/testframework.dir/__/generated/test-config.cc.o" CMakeFiles/testframework.dir/test_utils.cc.o CMakeFiles/testframework.dir/catch_amalgamated.cpp.o
+/usr/bin/ranlib libtestframework.a
