@@ -362,6 +362,23 @@ Scale 选项：
   --scale-factor F         按比例因子缩放（如 --scale-factor 0.5 缩小一半）
 ```
 
+#### `--scale-factor` 的作用
+
+`--scale-factor` 允许用户通过一个**浮点数比例因子**对图像进行等比缩放，而无需手动计算目标宽高。这在以下场景中非常有用：
+
+- **批量处理**：对不同尺寸的图像统一缩小到 50%（`--scale-factor 0.5`），无需针对每张图片单独指定目标宽高
+- **快速放大/缩小**：`--scale-factor 2.0` 放大两倍，`--scale-factor 0.25` 缩小到四分之一
+- **保持宽高比**：因子同时应用于宽和高，自动保持原始宽高比
+- **直观易用**：用户只需指定一个数字即可完成缩放，相比 `--scale WxH` 更加便捷
+
+计算方式：
+```
+new_width  = round(original_width  × factor)
+new_height = round(original_height × factor)
+```
+
+示例：一张 4000×3000 的图像使用 `--scale-factor 0.5` 后变为 2000×1500。
+
 ### 5.3 数据流设计
 
 ```
