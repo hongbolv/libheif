@@ -136,6 +136,9 @@ std::optional<heif_omaf_image_projection> omaf_image_projection;
 #endif
 std::vector<heif_brand2> additional_compatible_brands;
 
+int scale_width = 0;
+int scale_height = 0;
+
 enum heif_output_nclx_color_profile_preset
 {
   heif_output_nclx_color_profile_preset_custom,  // Default. Use the values provided by the user.
@@ -206,6 +209,7 @@ const int OPTION_SET_OMAF_IMAGE_PROJECTION = 1038;
 #endif
 const int OPTION_ADD_COMPATIBLE_BRAND = 1039;
 const int OPTION_UNIF = 1040;
+const int OPTION_SCALE = 1041;
 
 static option long_options[] = {
     {(char* const) "help",                    no_argument,       0,              'h'},
@@ -279,6 +283,7 @@ static option long_options[] = {
 #endif
     {(char* const) "add-compatible-brand",        required_argument,       nullptr, OPTION_ADD_COMPATIBLE_BRAND},
     {(char* const) "unif",                      no_argument,             nullptr, OPTION_UNIF},
+    {(char* const) "scale",                     required_argument,       nullptr, OPTION_SCALE},
     {0, 0,                                                           0,  0}
 };
 
@@ -316,6 +321,7 @@ void show_help(const char* argv0)
             << "      --verbose                  enable logging output (more will increase logging level)\n"
             << "  -b, --bit-depth #              number of bits to use from an 16-bit PNG input, valid range: 9-16 (default: 10 bit)\n"
             << "      --premultiplied-alpha      input image has premultiplied alpha\n"
+            << "      --scale WxH                scale the input image to the specified width and height before encoding\n"
 #if WITH_HEADER_COMPRESSION
             << "      --enable-metadata-compression ALGO  enable metadata item compression (experimental)\n"
             << "                                          Choose algorithm from {off"; // TODO: add 'auto', but it currently equals 'off'
@@ -1644,6 +1650,37 @@ int main(int argc, char** argv)
       case OPTION_UNIF:
         option_unif = true;
         break;
+      case OPTION_SCALE: {
+        std::string scale_str = optarg;
+        auto xpos = scale_str.find_first_of("xX");
+        if (xpos == std::string::npos) {
+          std::cerr << "Invalid scale parameter. Use format WxH (e.g., --scale 800x600).\n";
+          return 5;
+        }
+        try {
+          size_t w_end, h_end;
+          scale_width = std::stoi(scale_str.substr(0, xpos), &w_end);
+          std::string h_str = scale_str.substr(xpos + 1);
+          scale_height = std::stoi(h_str, &h_end);
+          if (w_end != xpos || h_end != h_str.size()) {
+            std::cerr << "Invalid scale dimensions. Use format WxH with integer values (e.g., --scale 800x600).\n";
+            return 5;
+          }
+        }
+        catch (const std::exception&) {
+          std::cerr << "Invalid scale dimensions. Width and height must be valid integers.\n";
+          return 5;
+        }
+        if (scale_width <= 0 || scale_height <= 0) {
+          std::cerr << "Invalid scale dimensions. Width and height must be positive integers.\n";
+          return 5;
+        }
+        if (scale_width > 65535 || scale_height > 65535) {
+          std::cerr << "Invalid scale dimensions. Width and height must not exceed 65535.\n";
+          return 5;
+        }
+        break;
+      }
     }
   }
 
@@ -2023,6 +2060,19 @@ int do_encode_images(heif_context* context, heif_encoder* encoder, heif_encoding
     }
 
     std::shared_ptr<heif_image> image = input_image.image;
+
+    // --- scale image if requested
+    if (scale_width > 0 && scale_height > 0) {
+      heif_image* scaled_image = nullptr;
+      heif_error err = heif_image_scale_image(image.get(), &scaled_image,
+                                              scale_width, scale_height,
+                                              nullptr);
+      if (err.code) {
+        std::cerr << "Could not scale image: " << err.message << "\n";
+        return 1;
+      }
+      image = std::shared_ptr<heif_image>(scaled_image, heif_image_release);
+    }
 
     if (use_tiling) {
       tile_generator = determine_input_images_tiling(input_filename, tiled_input_x_y);
