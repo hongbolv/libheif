@@ -375,70 +375,15 @@ namespace heif {
     class ScalingOptions
     {
     public:
-      enum Algorithm {
-        NearestNeighbor = heif_scaling_algorithm_nearest_neighbor,
-        SuperResolution = heif_scaling_algorithm_super_resolution
-      };
-
       ScalingOptions() : m_options(nullptr) {}
 
       /** Configure for AI super resolution using Enhanced EDSR fp32 model. */
       void set_super_resolution(const std::string& model_path,
-                                const std::string& device = "CPU")
-      {
-        if (!m_options) {
-          m_options = heif_scaling_options_alloc();
-        }
-        m_options->algorithm = heif_scaling_algorithm_super_resolution;
-        m_model_path = model_path;
-        m_device = device;
-        m_options->ivsr_model_path = m_model_path.c_str();
-        m_options->ivsr_device = m_device.c_str();
-      }
+                                const std::string& device = "CPU");
 
       const heif_scaling_options* get_c_options() const { return m_options; }
 
-      ~ScalingOptions()
-      {
-        if (m_options) {
-          heif_scaling_options_free(m_options);
-          m_options = nullptr;
-        }
-      }
-
-      // Non-copyable (options struct is heap-allocated)
-      ScalingOptions(const ScalingOptions&) = delete;
-      ScalingOptions& operator=(const ScalingOptions&) = delete;
-
-      // Movable
-      ScalingOptions(ScalingOptions&& other) noexcept
-        : m_options(other.m_options), m_model_path(std::move(other.m_model_path)),
-          m_device(std::move(other.m_device))
-      {
-        other.m_options = nullptr;
-        if (m_options) {
-          m_options->ivsr_model_path = m_model_path.c_str();
-          m_options->ivsr_device = m_device.c_str();
-        }
-      }
-
-      ScalingOptions& operator=(ScalingOptions&& other) noexcept
-      {
-        if (this != &other) {
-          if (m_options) {
-            heif_scaling_options_free(m_options);
-          }
-          m_options = other.m_options;
-          m_model_path = std::move(other.m_model_path);
-          m_device = std::move(other.m_device);
-          other.m_options = nullptr;
-          if (m_options) {
-            m_options->ivsr_model_path = m_model_path.c_str();
-            m_options->ivsr_device = m_device.c_str();
-          }
-        }
-        return *this;
-      }
+      ~ScalingOptions() { heif_scaling_options_free(m_options); }
 
     private:
       heif_scaling_options* m_options;
@@ -1076,6 +1021,19 @@ namespace heif {
   inline void Image::set_premultiplied_alpha(bool is_premultiplied_alpha) noexcept
   {
     heif_image_set_premultiplied_alpha(m_image.get(), is_premultiplied_alpha);
+  }
+
+  inline void Image::ScalingOptions::set_super_resolution(const std::string& model_path,
+                                                          const std::string& device)
+  {
+    if (!m_options) {
+      m_options = heif_scaling_options_alloc();
+    }
+    m_options->algorithm = heif_scaling_algorithm_super_resolution;
+    m_model_path = model_path;
+    m_device = device;
+    m_options->ivsr_model_path = m_model_path.c_str();
+    m_options->ivsr_device = m_device.c_str();
   }
 
   inline Image Image::scale_image(int width, int height,
