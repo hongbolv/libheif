@@ -516,7 +516,7 @@ libheif's `convert_colorspace()` only when OpenVINO cannot.**
 | Input Image Format | Who Converts | Method | Zero-Copy Input |
 |-------------------|--------------|--------|-----------------|
 | RGB interleaved u8 | — (no conversion needed) | Pass pointer directly | ✅ Yes |
-| BGR interleaved u8 | OpenVINO prepostProcessor | `set_color_format(BGR)`, `convert_color(RGB)` | ✅ Yes |
+| BGR interleaved u8 | OpenVINO prepostProcessor | `set_color_format(ColorFormat::BGR)`, `convert_color(ColorFormat::RGB)` | ✅ Yes |
 | NV12 | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
 | I420 | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
 | GRAY | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
@@ -840,7 +840,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // Configure tensor descriptors for Enhanced EDSR fp32 model.
     // iVSR's prepostProcessor uses these descriptors to handle all format
     // conversions internally:
-    //   Input:  NHWC u8 <tensor_color_format> (what we provide) → model's expected format
+    //   Input:  NHWC u8 RGB/BGR (determined by tensor_color_format) → model's expected format
     //   Output: model's internal format → NHWC u8 RGB (what we receive)
     // This eliminates the need for manual BGR swapping, layout transposition,
     // or precision conversion in our code.
