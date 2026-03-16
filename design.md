@@ -319,7 +319,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 
     for (int pass = 0; pass < num_passes; pass++) {
         int out_w = cur_w * 2, out_h = cur_h * 2;
-        size_t output_size = out_w * out_h * 3;  // NHWC u8
+        size_t output_size = out_w * out_h * 3;  // RGB u8 in NHWC layout
         current_output = allocate_buffer(output_size);
 
         ivsr_cb_t cb = {completion_callback, &cb_args};
