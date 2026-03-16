@@ -59,12 +59,13 @@ libheif's current scaling implementation:
 │   │ 2. iVSR Super Resolution Path                                │ │
 │   │    Used when: algorithm==super_resolution AND scale is 2×/4× │ │
 │   │    (ivsr_scaling_plugin.cc)                                   │ │
-│   │    a. Convert HeifPixelImage→RGB u8                          │ │
-│   │    b. ivsr_init() with tensor descriptors                    │ │
-│   │    c. ivsr_process() — prepostProcessor handles format       │ │
+│   │    a. Check if already RGB interleaved; if not, skip iVSR    │ │
+│   │    b. Pass RGB plane pointer directly to iVSR (zero-copy)    │ │
+│   │    c. ivsr_init() with tensor descriptors                    │ │
+│   │    d. ivsr_process() — prepostProcessor handles all format   │ │
 │   │       conversion (layout, precision, color) internally       │ │
-│   │    d. Convert RGB u8→HeifPixelImage                          │ │
-│   │    e. ivsr_deinit()                                          │ │
+│   │    e. iVSR writes into pre-allocated output plane (zero-copy)│ │
+│   │    f. ivsr_deinit()                                          │ │
 │   └──────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────┘
                                │
@@ -293,11 +294,18 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // The dispatcher guarantees target is exactly 2× or 4× of source
     int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
-    // Step 3: Convert HeifPixelImage to RGB interleaved (if needed)
-    // and get the plane pointer directly — no data copy
-    auto rgb_image = convert_to_rgb_interleaved(input);
+    // Step 3: Verify image is RGB interleaved — required for zero-copy iVSR input.
+    // iVSR expects contiguous RGB u8 data via its input tensor descriptor.
+    // If the image is not already in this format, return an error.
+    // Callers should use libheif's convert_colorspace() beforehand if needed.
+    if (input->image->get_colorspace() != heif_colorspace_RGB ||
+        input->image->get_chroma_format() != heif_chroma_interleaved_RGB) {
+        return heif_error{heif_error_Usage_error, heif_suberror_Unsupported_color_conversion,
+                          "iVSR requires RGB interleaved input"};
+    }
+
     size_t in_stride;
-    uint8_t* input_ptr = rgb_image->get_plane(heif_channel_interleaved, &in_stride);
+    uint8_t* input_ptr = input->image->get_plane(heif_channel_interleaved, &in_stride);
 
     // Step 4: Prepare iVSR configuration (EDSR fp32 defaults)
     // Configure tensor descriptors so prepostProcessor handles:
@@ -341,11 +349,11 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
         }
     }
 
-    // Step 7: Convert back to original colorspace if needed (no data copy from iVSR)
-    // iVSR already wrote directly into out_img's plane buffer
-    *output = finalize_output(out_img,
-                              input->image->get_colorspace(),
-                              input->image->get_chroma_format());
+    // Step 7: Output is already in RGB interleaved (same as input format).
+    // iVSR wrote directly into out_img's RGB plane buffer — no conversion needed.
+    // The caller (e.g., heif_enc) handles any further colorspace conversion
+    // required by the encoder (x265, SVT-HEVC, etc.).
+    *output = out_img;
 
     // Step 8: Cleanup
     ivsr_deinit(handle);
@@ -370,19 +378,21 @@ these buffers in-place via its prepostProcessor.
 │  ┌─────────────┐    ┌─────────────────┐  ┌───────────────────────┐  │
 │  │ HeifPixel   │    │ HeifPixelImage   │  │ iVSR prepostProcessor │  │
 │  │ Image       │───►│ RGB plane pointer│─►│ (handles internally): │  │
-│  │ (any format)│    │ (direct, no copy)│  │  - NHWC u8 → NCHW f32│  │
+│  │ (RGB intlvd)│    │ (direct, no copy)│  │  - NHWC u8 → NCHW f32│  │
 │  └─────────────┘    └─────────────────┘  │  - RGB ↔ model color  │  │
 │                                           │  - normalization       │  │
-│  libheif color-conversion/                └──────────┬────────────┘  │
-│  converts to RGB interleaved                         │               │
-│  (YCbCr→RGB, etc.)                           ivsr_process()          │
+│  Format check: must be RGB interleaved.   └──────────┬────────────┘  │
+│  Returns error if not.                               │               │
+│                                              ivsr_process()          │
 │                                                      │               │
 │  ┌─────────────┐    ┌─────────────────┐  ┌──────────▼────────────┐  │
 │  │ HeifPixel   │    │ HeifPixelImage   │  │ iVSR prepostProcessor │  │
 │  │ Image       │◄───│ RGB plane pointer│◄─│ (handles internally): │  │
-│  │ (original   │    │ (direct, no copy)│  │  - NCHW f32 → NHWC u8│  │
-│  │  format)    │    └─────────────────┘  │  - clamp + quantize   │  │
-│  └─────────────┘                          └───────────────────────┘  │
+│  │ (RGB intlvd)│    │ (direct, no copy)│  │  - NCHW f32 → NHWC u8│  │
+│  └─────────────┘                          │  - clamp + quantize   │  │
+│                                           └───────────────────────┘  │
+│  Output is RGB interleaved — caller handles                          │
+│  any further conversion for the encoder.                             │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -426,19 +436,10 @@ static uint8_t* create_output_image_and_get_ptr(
     return out_img->get_plane(heif_channel_interleaved, out_stride);
 }
 
-// After iVSR writes into the output plane, convert to target colorspace if needed.
-static std::shared_ptr<HeifPixelImage> finalize_output(
-    std::shared_ptr<HeifPixelImage> out_img,
-    heif_colorspace target_colorspace,
-    heif_chroma target_chroma)
-{
-    if (target_colorspace != heif_colorspace_RGB ||
-        target_chroma != heif_chroma_interleaved_RGB) {
-        out_img = convert_colorspace(out_img, target_colorspace, target_chroma,
-                                      nullptr, 8, nullptr);
-    }
-    return out_img;
-}
+// Output is RGB interleaved — same format as input (enforced by the checker).
+// No colorspace conversion is performed by the scaling function.
+// The caller (encoder pipeline) handles any further conversion needed
+// for the target codec (x265 → YCbCr 4:2:0, SVT-HEVC → YCbCr 4:2:0, etc.).
 ```
 
 ---
