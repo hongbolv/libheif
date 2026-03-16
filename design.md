@@ -16,7 +16,7 @@ Integrate **Intel Video Super Resolution (iVSR)** SDK into libheif's scale funct
 
 - **Patch-based inference**: Splits frames into small patches for efficient processing on hardware with limited memory.
 - **Heterogeneous execution**: Supports CPU, GPU (Intel Flex 170, Arc 770), and multi-GPU configurations.
-- **Multiple models**: Supports Enhanced BasicVSR (multi-frame, 2× upscale), Enhanced EDSR (single-frame, 2× upscale), TSENet (multi-frame, 2× upscale), and SVP (same-resolution enhancement).
+- **Multiple models**: Supports Enhanced BasicVSR (multi-frame, 2× upscale), Enhanced EDSR (single-frame, 2× upscale), TSENet (multi-frame, 2× upscale), and SVP (same-resolution enhancement). **This integration uses Enhanced EDSR fp32** as the first step.
 - **OpenVINO backend**: Uses Intel OpenVINO for inference.
 - **Simple C API**: `ivsr_init` → `ivsr_process` → `ivsr_deinit` lifecycle.
 
@@ -49,17 +49,24 @@ libheif's current scaling implementation:
 │                     libheif Scale Dispatcher                        │
 │                    (heif_image.cc / pixelimage.cc)                   │
 │                                                                     │
-│   ┌─────────────────────┐     ┌──────────────────────────────────┐ │
-│   │ Is scale-up AND     │ YES │  iVSR Super Resolution Path      │ │
-│   │ iVSR enabled in     ├────►│  (ivsr_scaling_plugin.cc)        │ │
-│   │ scaling_options?     │     │                                  │ │
-│   └──────────┬──────────┘     │  1. Convert HeifPixelImage→RGB   │ │
-│              │ NO              │  2. ivsr_init()                  │ │
-│              ▼                 │  3. ivsr_process()               │ │
-│   ┌─────────────────────┐     │  4. Convert RGB→HeifPixelImage   │ │
-│   │ Nearest-Neighbor    │     │  5. ivsr_deinit()                │ │
-│   │ (existing path)     │     └──────────────────────────────────┘ │
-│   └─────────────────────┘                                          │
+│   ┌──────────────────────────────────────────────────────────────┐ │
+│   │ Algorithm Selection (upfront, no fallback):                  │ │
+│   │                                                              │ │
+│   │ 1. options==NULL or algorithm==nearest_neighbor               │ │
+│   │    → Nearest-Neighbor (existing path)                        │ │
+│   │                                                              │ │
+│   │ 2. algorithm==super_resolution AND scale is 2× or 4×         │ │
+│   │    → iVSR Super Resolution Path                              │ │
+│   │    (ivsr_scaling_plugin.cc)                                   │ │
+│   │    a. Convert HeifPixelImage→RGB                             │ │
+│   │    b. ivsr_init()                                            │ │
+│   │    c. ivsr_process() (2× per pass, run twice for 4×)        │ │
+│   │    d. Convert RGB→HeifPixelImage                             │ │
+│   │    e. ivsr_deinit()                                          │ │
+│   │                                                              │ │
+│   │ 3. algorithm==super_resolution AND scale is NOT 2× or 4×     │ │
+│   │    → Nearest-Neighbor (SR not applicable)                    │ │
+│   └──────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────┘
                                │
                                ▼
@@ -68,7 +75,7 @@ libheif's current scaling implementation:
 │                                                                     │
 │   ┌──────────┐  ┌───────────────┐  ┌─────────────────────────────┐ │
 │   │ Patch    │  │ Task          │  │ OpenVINO Inference Engine   │ │
-│   │ Solution │─►│ Scheduler     │─►│ (CPU / GPU / Multi-GPU)    │ │
+│   │ Solution │─►│ Scheduler     │─►│ (CPU / GPU)                │ │
 │   └──────────┘  └───────────────┘  └─────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -79,7 +86,8 @@ libheif's current scaling implementation:
 2. **Optional dependency**: iVSR is an optional build-time dependency. libheif builds and works without it.
 3. **Plugin architecture**: iVSR integration follows libheif's existing plugin pattern — it can be compiled as a built-in module or a dynamic plugin.
 4. **Minimal API surface**: Extend the existing `heif_scaling_options` struct rather than adding new API functions.
-5. **Single-image focus**: Since libheif processes still images (not video), use single-frame SR models (Enhanced EDSR) as the primary model.
+5. **Single-image focus**: Since libheif processes still images (not video), use Enhanced EDSR (single-frame, fp32) as the SR model.
+6. **Exact scale factors only**: iVSR is invoked only for exact 2× or 4× upscaling. All other scale factors use nearest-neighbor.
 
 ---
 
@@ -99,7 +107,7 @@ enum heif_scaling_algorithm {
     /** Nearest-neighbor interpolation (default, fastest). */
     heif_scaling_algorithm_nearest_neighbor = 0,
 
-    /** AI-based super resolution using iVSR (best quality for upscaling). */
+    /** AI-based super resolution using iVSR (best quality for 2×/4× upscaling). */
     heif_scaling_algorithm_super_resolution = 1
 };
 
@@ -119,35 +127,15 @@ typedef struct heif_scaling_options {
     /**
      * iVSR configuration (only used when algorithm == heif_scaling_algorithm_super_resolution).
      * All fields below are ignored for other algorithms.
+     *
+     * The default configuration targets Enhanced EDSR fp32 model.
      */
 
-    /** Path to the OpenVINO IR model file (.xml). Required for SR. */
+    /** Path to the Enhanced EDSR OpenVINO IR model file (.xml). Required for SR. */
     const char* ivsr_model_path;
 
-    /** Target device for inference. Default: "CPU". Options: "CPU", "GPU", "MULTI:GPU.0,GPU.1" */
+    /** Target device for inference. Default: "CPU". Options: "CPU", "GPU" */
     const char* ivsr_device;
-
-    /** Inference precision. Default: "f32". Options: "f32", "f16", "bf16" */
-    const char* ivsr_precision;
-
-    /** Path to custom extension library (for Enhanced BasicVSR). Optional. */
-    const char* ivsr_extension_lib;
-
-    /** Path to custom op XML config (for Enhanced BasicVSR). Optional. */
-    const char* ivsr_cldnn_config;
-
-    /** Normalization factor for the model. Default: 255.0.
-     *  - Set to 255.0 for Enhanced BasicVSR and most models.
-     *  - Set to 1.0 for Enhanced EDSR.
-     *  The normalize_factor must match what the model expects. */
-    float ivsr_normalize_factor;
-
-    /** Scale factor of the SR model. Default: 2 (produces 2× output).
-     *  This must match the actual model's scale factor. If the model produces
-     *  a different scale factor, the output dimensions will be incorrect.
-     *  After the SR pass, a nearest-neighbor resize is applied if the SR output
-     *  doesn't match the requested target dimensions. */
-    int ivsr_scale_factor;
 } heif_scaling_options;
 
 /**
@@ -155,10 +143,11 @@ typedef struct heif_scaling_options {
  *
  * Default values:
  *   - algorithm: heif_scaling_algorithm_nearest_neighbor
+ *   - ivsr_model_path: NULL
  *   - ivsr_device: "CPU"
- *   - ivsr_precision: "f32"
- *   - ivsr_normalize_factor: 255.0
- *   - ivsr_scale_factor: 2
+ *
+ * The configuration is pre-set for Enhanced EDSR fp32 model (normalize_factor=1.0,
+ * precision=fp32, scale_factor=2). These are internal defaults not exposed to the user.
  *
  * @return Pointer to allocated options, or NULL on failure.
  *         Must be freed with heif_scaling_options_free().
@@ -187,12 +176,9 @@ public:
 
     ScalingOptions() : m_options(nullptr) {}
 
-    /** Configure for AI super resolution. */
+    /** Configure for AI super resolution using Enhanced EDSR fp32 model. */
     void set_super_resolution(const std::string& model_path,
-                              const std::string& device = "CPU",
-                              const std::string& precision = "f32",
-                              float normalize_factor = 255.0f,
-                              int scale_factor = 2);
+                              const std::string& device = "CPU");
 
     // Internal: get the C struct pointer
     const heif_scaling_options* get_c_options() const { return m_options; }
@@ -212,12 +198,11 @@ The existing API contract is fully preserved:
 // This continues to work exactly as before (nearest-neighbor):
 heif_image_scale_image(input, &output, width, height, NULL);
 
-// New usage with super resolution:
+// New usage with super resolution (2× upscale with EDSR):
 heif_scaling_options* opts = heif_scaling_options_alloc();
 opts->algorithm = heif_scaling_algorithm_super_resolution;
 opts->ivsr_model_path = "/path/to/edsr_model.xml";
-opts->ivsr_device = "GPU";
-heif_image_scale_image(input, &output, width, height, opts);
+heif_image_scale_image(input, &output, width * 2, height * 2, opts);
 heif_scaling_options_free(opts);
 ```
 
@@ -227,7 +212,7 @@ heif_scaling_options_free(opts);
 
 ### 4.1 Scale Dispatcher Logic
 
-The `heif_image_scale_image()` function is updated to dispatch based on options:
+The `heif_image_scale_image()` function is updated to dispatch based on options. The algorithm selection is done entirely upfront — iVSR is only invoked for exact 2× or 4× upscaling:
 
 ```c
 // In heif_image.cc
@@ -237,37 +222,32 @@ heif_error heif_image_scale_image(const heif_image* input,
                                   int width, int height,
                                   const heif_scaling_options* options)
 {
-    // Determine if this is an upscale operation.
-    // Both dimensions must be >= original (at least one strictly larger) to qualify.
-    // If one dimension is larger but the other is smaller (anisotropic scaling),
-    // nearest-neighbor is used since SR models produce uniform scale factors.
-    bool is_upscale = (width >= (int)input->image->get_width() &&
-                       height >= (int)input->image->get_height()) &&
-                      (width > (int)input->image->get_width() ||
-                       height > (int)input->image->get_height());
+    int src_w = (int)input->image->get_width();
+    int src_h = (int)input->image->get_height();
 
-    // Use iVSR super resolution if:
-    //   1. options is not NULL
-    //   2. algorithm is set to super_resolution
-    //   3. this is an upscale operation
-    //   4. iVSR support is compiled in
+    // --- Algorithm selection (all decisions made here, no fallback later) ---
+
     if (options != NULL &&
-        options->algorithm == heif_scaling_algorithm_super_resolution &&
-        is_upscale) {
+        options->algorithm == heif_scaling_algorithm_super_resolution) {
+
+        // Determine the scale factor
+        // iVSR only supports exact 2× or 4× upscaling
+        bool is_2x = (width == src_w * 2 && height == src_h * 2);
+        bool is_4x = (width == src_w * 4 && height == src_h * 4);
+
+        if (is_2x || is_4x) {
 #if HAVE_IVSR
-        return heif_image_scale_with_ivsr(input, output, width, height, options);
+            // Dispatch to iVSR super resolution
+            // For 4×: internally runs two passes of 2× SR
+            return heif_image_scale_with_ivsr(input, output, width, height, options);
 #else
-        return {heif_error_Unsupported_feature, heif_suberror_Unspecified,
-                "iVSR super resolution support not compiled in"};
+            return {heif_error_Unsupported_feature, heif_suberror_Unspecified,
+                    "iVSR super resolution support not compiled in"};
 #endif
-    }
+        }
 
-    // If SR was explicitly requested but this is not an upscale, return an error
-    if (options != NULL &&
-        options->algorithm == heif_scaling_algorithm_super_resolution &&
-        !is_upscale) {
-        return {heif_error_Usage_error, heif_suberror_Unspecified,
-                "Super resolution can only be used for upscaling"};
+        // For non-2×/4× scale factors, use nearest-neighbor
+        // (SR models only produce exact 2× output per pass)
     }
 
     // Default: nearest-neighbor scaling (existing behavior)
@@ -310,57 +290,57 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     int src_width  = heif_image_get_width(input, heif_channel_interleaved);
     int src_height = heif_image_get_height(input, heif_channel_interleaved);
 
-    // Step 2: Convert HeifPixelImage to RGB 8-bit interleaved (iVSR input format)
-    // If the image is in YCbCr or other format, convert to RGB first
+    // Step 2: Determine number of SR passes
+    // The dispatcher guarantees target is exactly 2× or 4× of source
+    int num_passes = (target_width == src_width * 4) ? 2 : 1;
+
+    // Step 3: Convert HeifPixelImage to RGB 8-bit interleaved (iVSR input format)
     heif_image* rgb_input = convert_to_rgb_interleaved(input);
 
-    // Step 3: Prepare iVSR configuration
+    // Step 4: Prepare iVSR configuration (EDSR fp32 defaults)
     ivsr_config_t* configs = build_ivsr_config(options, src_width, src_height);
 
-    // Step 4: Initialize iVSR
+    // Step 5: Initialize iVSR
     ivsr_handle handle = nullptr;
     IVSRStatus status = ivsr_init(configs, &handle);
     if (status != OK) {
         return error("Failed to initialize iVSR engine");
     }
 
-    // Step 5: Query the model output dimensions
-    tensor_desc_t output_desc;
-    ivsr_get_attr(handle, OUTPUT_TENSOR_DESC, &output_desc);
-    int sr_width  = output_desc.shape[3];  // NCHW layout
-    int sr_height = output_desc.shape[2];
+    // Step 6: Run SR passes
+    char* current_input = get_rgb_plane_data(rgb_input);
+    char* current_output = nullptr;
+    int cur_w = src_width, cur_h = src_height;
 
-    // Step 6: Allocate input/output buffers
-    size_t input_size  = src_width * src_height * 3;       // RGB u8
-    size_t output_size = sr_width * sr_height * 3 * sizeof(float);  // RGB fp32
-    char* input_data   = get_rgb_plane_data(rgb_input);
-    char* output_data  = allocate_buffer(output_size);
+    for (int pass = 0; pass < num_passes; pass++) {
+        int out_w = cur_w * 2, out_h = cur_h * 2;
+        size_t output_size = out_w * out_h * 3 * sizeof(float);
+        current_output = allocate_buffer(output_size);
 
-    // Step 7: Run iVSR inference
-    ivsr_cb_t cb = {completion_callback, &cb_args};
-    status = ivsr_process(handle, input_data, output_data, &cb);
-    if (status != OK) {
-        ivsr_deinit(handle);
-        return error("iVSR processing failed");
+        ivsr_cb_t cb = {completion_callback, &cb_args};
+        status = ivsr_process(handle, current_input, current_output, &cb);
+        if (status != OK) {
+            ivsr_deinit(handle);
+            return error("iVSR processing failed");
+        }
+
+        // For second pass, use output of first pass as input
+        if (pass < num_passes - 1) {
+            current_input = convert_fp32_to_u8(current_output, out_w, out_h);
+            cur_w = out_w;
+            cur_h = out_h;
+        }
     }
 
-    // Step 8: Convert iVSR output (NCHW fp32) back to HeifPixelImage
-    *output = convert_nchw_fp32_to_heif_image(output_data, sr_width, sr_height,
-                                               options->ivsr_normalize_factor,
+    // Step 7: Convert iVSR output (NCHW fp32) back to HeifPixelImage
+    *output = convert_nchw_fp32_to_heif_image(current_output, target_width, target_height,
+                                               1.0f, // EDSR normalize_factor
                                                input->image->get_colorspace(),
                                                input->image->get_chroma_format());
 
-    // Step 9: If SR output size != target size, do final nearest-neighbor resize
-    if (sr_width != target_width || sr_height != target_height) {
-        heif_image* final_output;
-        heif_image_scale_image(*output, &final_output, target_width, target_height, NULL);
-        heif_image_release(*output);
-        *output = final_output;
-    }
-
-    // Step 10: Cleanup
+    // Step 8: Cleanup
     ivsr_deinit(handle);
-    free_buffer(output_data);
+    free_buffer(current_output);
     free_ivsr_configs(configs);
 
     return heif_error_ok;
@@ -393,7 +373,7 @@ iVSR expects specific data formats. The conversion pipeline:
 │  └─────────────┘                                                     │
 │                     Post-processing:                                 │
 │                     - Clamp to [0, 1]                                │
-│                     - Multiply by normalize_factor (255)             │
+│                     - Multiply by normalize_factor (1.0 for EDSR)    │
 │                     - Convert fp32 → u8                              │
 │                     - Transpose NCHW → HWC                           │
 │                     - Optionally convert RGB → YCbCr                 │
@@ -432,9 +412,9 @@ static std::vector<uint8_t> heif_to_ivsr_input(const HeifPixelImage& image) {
 
 ```cpp
 // Convert iVSR NCHW fp32 output to HeifPixelImage
+// For Enhanced EDSR fp32, normalize_factor = 1.0
 static std::shared_ptr<HeifPixelImage> ivsr_output_to_heif(
     const float* nchw_data, int width, int height,
-    float normalize_factor,
     heif_colorspace target_colorspace,
     heif_chroma target_chroma)
 {
@@ -447,12 +427,12 @@ static std::shared_ptr<HeifPixelImage> ivsr_output_to_heif(
     uint8_t* out = img->get_plane(heif_channel_interleaved, &stride);
 
     // Step 2: Transpose NCHW to HWC and convert fp32 to u8
+    // EDSR output is already in [0, 255] range (normalize_factor=1.0)
     // NCHW layout: data[c * H * W + y * W + x]
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             for (int c = 0; c < 3; c++) {
                 float val = nchw_data[c * height * width + y * width + x];
-                val = val * normalize_factor;
                 val = std::clamp(val, 0.0f, 255.0f);
                 out[y * stride + x * 3 + c] = static_cast<uint8_t>(val + 0.5f);
             }
@@ -550,9 +530,10 @@ make -j$(nproc)
 
 | File | Change |
 |------|--------|
-| `libheif/api/libheif/heif_image.h` | Define `heif_scaling_options` struct, add `heif_scaling_algorithm` enum, add `heif_scaling_options_alloc/free` |
-| `libheif/api/libheif/heif_image.cc` | Update `heif_image_scale_image()` to dispatch to iVSR when configured |
+| `libheif/api/libheif/heif_image.h` | Define `heif_scaling_options` struct (model path + device), add `heif_scaling_algorithm` enum, add `heif_scaling_options_alloc/free` |
+| `libheif/api/libheif/heif_image.cc` | Update `heif_image_scale_image()` to dispatch to iVSR for exact 2×/4× upscaling |
 | `libheif/api/libheif/heif_cxx.h` | Extend `ScalingOptions` C++ class |
+| `examples/heif_enc.cc` | Add `--sr-model` and `--sr-device` options, pass `heif_scaling_options` to scale API |
 | `libheif/pixelimage.h` | No changes needed |
 | `libheif/pixelimage.cc` | No changes needed (nearest-neighbor stays as-is) |
 | `CMakeLists.txt` | Add `WITH_IVSR` option |
@@ -571,15 +552,18 @@ extern "C" {
 #endif
 
 /**
- * @brief Scale an image using iVSR AI super resolution.
+ * @brief Scale an image using iVSR AI super resolution (Enhanced EDSR fp32).
  *
  * This function is called internally by heif_image_scale_image() when
- * the scaling options specify super resolution algorithm.
+ * the scaling options specify super resolution algorithm and the target
+ * dimensions are exactly 2× or 4× of the source.
+ *
+ * For 4× scaling, two passes of 2× SR are applied internally.
  *
  * @param input       Source image
  * @param output      Pointer to receive the scaled output image
- * @param width       Target width
- * @param height      Target height
+ * @param width       Target width (must be exactly 2× or 4× of source)
+ * @param height      Target height (must be exactly 2× or 4× of source)
  * @param options     Scaling options with iVSR configuration
  * @return heif_error indicating success or failure
  */
@@ -627,9 +611,15 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     const auto& src_image = input->image;
     int src_width  = src_image->get_width();
     int src_height = src_image->get_height();
-    int scale_factor = options->ivsr_scale_factor > 0 ? options->ivsr_scale_factor : 2;
-    float normalize_factor = options->ivsr_normalize_factor > 0
-                             ? options->ivsr_normalize_factor : 255.0f;
+
+    // EDSR fp32 defaults (hardcoded for first step)
+    const int scale_factor = 2;         // EDSR produces 2× output per pass
+    const float normalize_factor = 1.0f; // Enhanced EDSR uses normalize_factor=1.0
+    const char* precision = "f32";       // fp32 inference
+
+    // Determine number of passes: 1 for 2×, 2 for 4×
+    // The dispatcher guarantees target is exactly 2× or 4× of source
+    int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
     // --- Step 1: Convert to RGB interleaved 8-bit ---
     // Use libheif's existing color conversion infrastructure
@@ -669,7 +659,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     }
 
     // --- Step 3: Build iVSR configuration linked list ---
-    // (Following the pattern from ivsr_sdk/samples/vsr_sample.cpp)
+    // Simplified for Enhanced EDSR fp32 model (no extension libs or custom ops needed)
     std::vector<ivsr_config_t> configs;
     auto add_config = [&configs](IVSRConfigKey key, const void* value) {
         ivsr_config_t cfg;
@@ -687,20 +677,13 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     const char* device = options->ivsr_device ? options->ivsr_device : "CPU";
     add_config(TARGET_DEVICE, device);
 
-    if (options->ivsr_precision) {
-        add_config(PRECISION, options->ivsr_precision);
-    }
-    if (options->ivsr_extension_lib) {
-        add_config(CUSTOM_LIB, options->ivsr_extension_lib);
-    }
-    if (options->ivsr_cldnn_config) {
-        add_config(CLDNN_CONFIG, options->ivsr_cldnn_config);
-    }
+    add_config(PRECISION, precision);
 
     std::string input_res = std::to_string(src_width) + "," + std::to_string(src_height);
     add_config(INPUT_RES, input_res.c_str());
 
-    // Configure tensor descriptors for single-image SR.
+    // Configure tensor descriptors for Enhanced EDSR fp32 model.
+    // EDSR is a single-image SR model with 4D tensors (no frame dimension).
     // Note: tensor_color_format="BGR" indicates the byte order of input data as fed to iVSR.
     // model_color_format="RGB" indicates the color order expected by the model internally.
     // iVSR handles the BGR→RGB conversion internally based on these descriptors.
@@ -711,7 +694,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
         .layout = "NHWC",
         .tensor_color_format = "BGR",
         .model_color_format = "RGB",
-        .scale = normalize_factor,
+        .scale = normalize_factor,  // 1.0 for EDSR
         .dimension = 4,
         .shape = {1, (size_t)src_height, (size_t)src_width, 3}
     };
@@ -758,6 +741,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     }
 
     // --- Step 7: Convert NCHW fp32 output to HeifPixelImage ---
+    // EDSR output is already in [0, 255] range (normalize_factor=1.0)
     auto out_img = std::make_shared<HeifPixelImage>();
     out_img->create(sr_width, sr_height, heif_colorspace_RGB, heif_chroma_interleaved_RGB);
     out_img->add_plane(heif_channel_interleaved, sr_width, sr_height, 8, nullptr);
@@ -769,7 +753,6 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
         for (int x = 0; x < sr_width; x++) {
             for (int c = 0; c < 3; c++) {
                 float val = output_buffer[c * sr_height * sr_width + y * sr_width + x];
-                val *= normalize_factor;
                 val = std::clamp(val, 0.0f, 255.0f);
                 out_data[y * out_stride + x * 3 + c] = static_cast<uint8_t>(val + 0.5f);
             }
@@ -784,22 +767,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
                                       nullptr, 8, nullptr);
     }
 
-    // --- Step 9: Final resize if SR output doesn't match target ---
+    // --- Step 9: Return result ---
+    // No fallback resize needed — the dispatcher guarantees exact 2× or 4× scaling
     *output = new heif_image;
     (*output)->image = std::move(out_img);
-
-    if (sr_width != target_width || sr_height != target_height) {
-        heif_image* resized = nullptr;
-        heif_error resize_err = heif_image_scale_image(*output, &resized,
-                                                        target_width, target_height, NULL);
-        if (resize_err.code != heif_error_Ok) {
-            heif_image_release(*output);
-            ivsr_deinit(handle);
-            return resize_err;
-        }
-        heif_image_release(*output);
-        *output = resized;
-    }
 
     // --- Step 10: Cleanup ---
     ivsr_deinit(handle);
@@ -818,11 +789,11 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 |----------|----------|
 | `options == NULL` | Use nearest-neighbor (existing behavior) |
 | `algorithm == super_resolution` but `HAVE_IVSR` not defined | Return `heif_error_Unsupported_feature` |
+| `algorithm == super_resolution` but scale is not 2× or 4× | Use nearest-neighbor (decided at dispatch) |
 | `ivsr_model_path` is NULL | Return `heif_error_Usage_error` |
 | Model file not found | Return `heif_error_Plugin_loading_error` (from iVSR init failure) |
 | iVSR init fails | Return `heif_error_Plugin_loading_error` with iVSR status |
 | iVSR inference fails | Return `heif_error_Encoding_error`, cleanup resources |
-| Downscale with SR algorithm | Return `heif_error_Usage_error` with a message indicating SR is only for upscaling |
 | Unsupported color format | Convert to RGB first using libheif's color conversion |
 | HDR (16-bit) input | Convert to 8-bit RGB for iVSR, upscale, then user may re-encode |
 
@@ -840,111 +811,111 @@ struct IVSRGuard {
 
 ---
 
-## 8. Scaling Strategy for Arbitrary Dimensions
+## 8. Scaling Strategy
 
-iVSR models produce fixed scale factors (typically 2×). To support arbitrary target dimensions:
+iVSR Enhanced EDSR model produces a fixed 2× scale factor per pass. The dispatcher routes scaling requests as follows:
+
+| Requested Scale | Algorithm Used |
+|-----------------|---------------|
+| Exactly 2× (w×2, h×2) | iVSR SR (single pass) |
+| Exactly 4× (w×4, h×4) | iVSR SR (two passes of 2×) |
+| Any other factor | Nearest-neighbor (SR not applicable) |
 
 ```
-Input: 640×480 → Target: 1920×1080
+Example 1: 640×480 → 1280×960 (2×)
+  → Single iVSR 2× SR pass
 
-Strategy:
-1. Run iVSR 2× SR: 640×480 → 1280×960 (AI upscale)
-2. If still smaller than target, run iVSR again: 1280×960 → 2560×1920
-3. Final nearest-neighbor resize: 2560×1920 → 1920×1080 (crop/fit)
+Example 2: 640×480 → 2560×1920 (4×)
+  → Pass 1: iVSR 2× SR: 640×480 → 1280×960
+  → Pass 2: iVSR 2× SR: 1280×960 → 2560×1920
 
-Alternative (simpler, recommended for v1):
-1. Run iVSR 2× SR: 640×480 → 1280×960
-2. Nearest-neighbor resize: 1280×960 → 1920×1080
+Example 3: 640×480 → 1920×1080 (3×, non-exact)
+  → Nearest-neighbor scaling (iVSR not used)
 ```
-
-The initial implementation uses the simpler approach (single SR pass + nearest-neighbor adjustment). Multi-pass SR can be added in a future version.
 
 ---
 
-## 9. Usage Examples
+## 9. Usage Example: heif_enc Integration
 
-### 9.1 C API Example
+The iVSR super resolution is integrated into the `heif_enc` encoder sample. This adds two new command-line options to enable SR when using the existing `--scale` option:
 
-```c
-#include <libheif/heif.h>
+### 9.1 New Command-Line Options for heif_enc
 
-int main() {
-    // Decode a HEIF image
-    heif_context* ctx = heif_context_alloc();
-    heif_context_read_from_file(ctx, "input.heif", NULL);
-
-    heif_image_handle* handle;
-    heif_context_get_primary_image_handle(ctx, &handle);
-
-    heif_image* image;
-    heif_decode_image(handle, &image, heif_colorspace_RGB,
-                      heif_chroma_interleaved_RGB, NULL);
-
-    // Scale up 2× using AI super resolution
-    heif_scaling_options* opts = heif_scaling_options_alloc();
-    opts->algorithm = heif_scaling_algorithm_super_resolution;
-    opts->ivsr_model_path = "/models/enhanced_edsr.xml";
-    opts->ivsr_device = "GPU";
-    opts->ivsr_normalize_factor = 1.0;  // Enhanced EDSR requires 1.0 (overrides default 255.0)
-
-    int orig_w = heif_image_get_width(image, heif_channel_interleaved);
-    int orig_h = heif_image_get_height(image, heif_channel_interleaved);
-
-    heif_image* sr_image;
-    heif_error err = heif_image_scale_image(image, &sr_image,
-                                             orig_w * 2, orig_h * 2, opts);
-    if (err.code != heif_error_Ok) {
-        fprintf(stderr, "Super resolution failed: %s\n", err.message);
-        // Fall back to default scaling
-        heif_image_scale_image(image, &sr_image,
-                                orig_w * 2, orig_h * 2, NULL);
-    }
-
-    // Use sr_image...
-
-    heif_scaling_options_free(opts);
-    heif_image_release(sr_image);
-    heif_image_release(image);
-    heif_image_handle_release(handle);
-    heif_context_free(ctx);
-    return 0;
-}
+```
+--sr-model <path>    Path to Enhanced EDSR OpenVINO IR model (.xml). Enables SR for --scale.
+--sr-device <device> Device for SR inference: CPU (default) or GPU.
 ```
 
-### 9.2 C++ API Example
-
-```cpp
-#include <libheif/heif_cxx.h>
-
-int main() {
-    heif::Context ctx;
-    ctx.read_from_file("input.heif");
-
-    heif::ImageHandle handle = ctx.get_primary_image_handle();
-    heif::Image image = handle.decode_image(heif_colorspace_RGB,
-                                             heif_chroma_interleaved_RGB);
-
-    int w = image.get_width(heif_channel_interleaved);
-    int h = image.get_height(heif_channel_interleaved);
-
-    // Configure super resolution scaling
-    heif::Image::ScalingOptions opts;
-    opts.set_super_resolution("/models/enhanced_edsr.xml", "CPU", "f32", 1.0, 2);
-
-    // Scale up with AI super resolution
-    heif::Image sr_image = image.scale_image(w * 2, h * 2, opts);
-
-    return 0;
-}
-```
-
-### 9.3 Command-Line Tool Integration (heif_dec)
+### 9.2 Usage
 
 ```bash
-# Decode and upscale using AI super resolution
-heif_dec input.heif -o output.png --scale 2 \
-        --sr-model /models/enhanced_edsr.xml \
-        --sr-device GPU
+# Scale up 2× using AI super resolution on CPU
+heif_enc input.png -o output.heif --scale 1280x960 \
+         --sr-model /models/enhanced_edsr.xml
+
+# Scale up 2× using AI super resolution on GPU
+heif_enc input.png -o output.heif --scale 1280x960 \
+         --sr-model /models/enhanced_edsr.xml --sr-device GPU
+
+# Scale up 4× using AI super resolution (two SR passes)
+heif_enc input.png -o output.heif --scale 2560x1920 \
+         --sr-model /models/enhanced_edsr.xml
+
+# Non-2×/4× scaling falls back to nearest-neighbor even if --sr-model is set
+heif_enc input.png -o output.heif --scale 1920x1080 \
+         --sr-model /models/enhanced_edsr.xml
+```
+
+### 9.3 heif_enc Code Changes
+
+```cpp
+// In examples/heif_enc.cc
+
+// New option constants
+const int OPTION_SR_MODEL  = 1042;
+const int OPTION_SR_DEVICE = 1043;
+
+// New global variables
+std::string sr_model_path;
+std::string sr_device = "CPU";
+
+// Add to long_options array:
+{(char* const) "sr-model",  required_argument, nullptr, OPTION_SR_MODEL},
+{(char* const) "sr-device", required_argument, nullptr, OPTION_SR_DEVICE},
+
+// Add to option parsing:
+case OPTION_SR_MODEL:
+    sr_model_path = optarg;
+    break;
+case OPTION_SR_DEVICE:
+    sr_device = optarg;
+    break;
+
+// Update scaling section:
+if (scale_width > 0 && scale_height > 0) {
+    heif_image* scaled_image = nullptr;
+    heif_scaling_options* scale_opts = nullptr;
+
+    // If SR model is provided, configure super resolution
+    if (!sr_model_path.empty()) {
+        scale_opts = heif_scaling_options_alloc();
+        scale_opts->algorithm = heif_scaling_algorithm_super_resolution;
+        scale_opts->ivsr_model_path = sr_model_path.c_str();
+        scale_opts->ivsr_device = sr_device.c_str();
+    }
+
+    heif_error err = heif_image_scale_image(image.get(), &scaled_image,
+                                            scale_width, scale_height,
+                                            scale_opts);
+    if (scale_opts) {
+        heif_scaling_options_free(scale_opts);
+    }
+    if (err.code) {
+        std::cerr << "Could not scale image: " << err.message << "\n";
+        return 1;
+    }
+    image = std::shared_ptr<heif_image>(scaled_image, heif_image_release);
+}
 ```
 
 ---
@@ -964,7 +935,6 @@ heif_dec input.heif -o output.png --scale 2 \
 1. **Lazy initialization**: Cache the iVSR handle across multiple calls with the same model, avoiding repeated model loading.
 2. **Patch-based processing**: iVSR's built-in patch solution handles large images that exceed GPU memory.
 3. **Async processing**: Use `ivsr_process_async` for non-blocking operation when processing multiple images.
-4. **Model selection**: Use Enhanced EDSR (single-frame) for still images — no need for multi-frame models like BasicVSR.
 
 ### 10.3 Handle Caching (Future Enhancement)
 
@@ -995,7 +965,7 @@ public:
 | `test_scale_options_null` | Verify NULL options still uses nearest-neighbor |
 | `test_scale_options_default` | Verify default-initialized options use nearest-neighbor |
 | `test_scale_sr_no_model` | Verify error when SR selected but no model path |
-| `test_scale_downscale_sr` | Verify downscale with SR falls back to nearest-neighbor |
+| `test_scale_non_2x_4x_sr` | Verify non-2×/4× scale with SR falls back to nearest-neighbor |
 | `test_scale_options_alloc_free` | Verify alloc/free lifecycle |
 
 ### 11.2 Integration Tests (require iVSR SDK + model files)
@@ -1004,9 +974,9 @@ public:
 |-----------|-------------|
 | `test_sr_rgb_2x` | 2× upscale of RGB image via EDSR |
 | `test_sr_ycbcr_2x` | 2× upscale of YCbCr 4:2:0 image (auto-convert) |
-| `test_sr_arbitrary_size` | Upscale to non-2× size (SR + nearest-neighbor) |
+| `test_sr_4x` | 4× upscale via two SR passes |
 | `test_sr_gpu_device` | Run inference on GPU |
-| `test_sr_roundtrip` | Decode HEIF → SR upscale → encode HEIF |
+| `test_sr_heif_enc` | heif_enc --scale with --sr-model end-to-end |
 
 ### 11.3 Quality Validation
 
@@ -1017,26 +987,26 @@ public:
 
 ## 12. Future Enhancements
 
-1. **Multi-pass SR**: Apply SR multiple times for > 2× upscale (e.g., 4× = two passes of 2×).
+1. **Additional SR models**: Support Enhanced BasicVSR (multi-frame) and TSENet models with configurable options.
 2. **Model auto-detection**: Automatically select the best model based on image characteristics.
 3. **Handle caching**: Reuse iVSR handles across multiple `heif_image_scale_image` calls.
 4. **Async API**: Add `heif_image_scale_image_async` for non-blocking SR processing.
 5. **Additional SR backends**: Support other SR engines beyond iVSR (e.g., ONNX Runtime, TensorRT).
 6. **Dynamic plugin loading**: Package iVSR integration as a dynamically loadable libheif plugin.
-7. **SVP support**: Integrate iVSR's Smart Video Processing for bandwidth-optimized encoding.
-8. **HDR support**: Support 16-bit HDR images through appropriate model and conversion pipeline.
-9. **Bilinear/bicubic fallback**: Add traditional interpolation algorithms as intermediate options between nearest-neighbor and AI SR.
+7. **HDR support**: Support 16-bit HDR images through appropriate model and conversion pipeline.
+8. **Bilinear/bicubic algorithms**: Add traditional interpolation algorithms as intermediate options between nearest-neighbor and AI SR.
+9. **Arbitrary scale factors**: Support non-2×/4× upscaling by combining SR with final resize.
 
 ---
 
 ## 13. Summary
 
-This design integrates iVSR AI super resolution into libheif's existing scaling API with minimal changes:
+This design integrates iVSR AI super resolution (Enhanced EDSR fp32) into libheif's existing scaling API with minimal changes:
 
 - **1 new enum** (`heif_scaling_algorithm`) for algorithm selection
-- **1 struct definition** (`heif_scaling_options`) completing the existing forward declaration
+- **1 struct definition** (`heif_scaling_options`) completing the existing forward declaration (model path + device only)
 - **2 new helper functions** (`heif_scaling_options_alloc/free`) for lifecycle management
 - **2 new source files** (`ivsr_scaling_plugin.cc/.h`) for the iVSR bridge
-- **Minor updates** to the scale dispatcher, CMake build system, and C++ wrapper
+- **Minor updates** to the scale dispatcher, CMake build system, C++ wrapper, and heif_enc sample
 
-The design preserves full backward compatibility — existing code passing `NULL` for scaling options continues to work identically. iVSR is an optional compile-time dependency, and the feature gracefully degrades when not available.
+The dispatcher selects the algorithm upfront: iVSR is used only for exact 2× or 4× upscaling; all other scale factors use nearest-neighbor. The design preserves full backward compatibility — existing code passing `NULL` for scaling options continues to work identically. iVSR is an optional compile-time dependency, and the feature gracefully degrades when not available.
