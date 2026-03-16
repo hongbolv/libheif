@@ -299,9 +299,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
     // Step 3: Prepare input — select best conversion path.
-    // OpenVINO prepostProcessor can handle: RGB, BGR, NV12, I420, GRAY.
-    // For formats OpenVINO cannot handle (HEIF YCbCr planar, 16-bit HDR),
-    // fall back to libheif's convert_colorspace().
+    // Initial implementation: RGB/BGR interleaved → OpenVINO (zero-copy).
+    // All other formats (HEIF YCbCr planar, NV12, I420, GRAY, 16-bit HDR)
+    // → libheif convert_colorspace() fallback.
+    // (OpenVINO supports NV12/I420/GRAY natively — deferred to future enhancement.)
     std::shared_ptr<HeifPixelImage> converted_image;
     const char* tensor_color_format = nullptr;
     size_t in_stride;
@@ -467,21 +468,19 @@ libheif's `convert_colorspace()` only when OpenVINO cannot.**
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │ 2. Input Format Check & Conversion                               │  │
 │  │                                                                   │  │
-│  │    Can OpenVINO handle the input color format directly?           │  │
+│  │    Initial implementation — two paths:                            │  │
 │  │                                                                   │  │
-│  │    ✅ YES (OpenVINO handles it):                                  │  │
-│  │      - RGB interleaved → pass directly, zero-copy                 │  │
+│  │    ✅ OpenVINO handles directly (zero-copy):                      │  │
+│  │      - RGB interleaved → pass directly, no conversion             │  │
 │  │      - BGR interleaved → OpenVINO convert_color(BGR→RGB)          │  │
-│  │      - NV12 → OpenVINO convert_color(NV12→RGB)                   │  │
-│  │      - I420 → OpenVINO convert_color(I420→RGB)                   │  │
-│  │      - GRAY → OpenVINO convert_color(GRAY→RGB)                   │  │
 │  │                                                                   │  │
-│  │    ❌ NO (libheif fallback):                                      │  │
-│  │      - HEIF YCbCr planar (4:2:0/4:2:2/4:4:4) with separate      │  │
-│  │        Y/Cb/Cr planes and chroma subsampling                      │  │
-│  │        → libheif convert_colorspace() to RGB interleaved first    │  │
+│  │    ❌ libheif fallback (convert_colorspace → RGB interleaved):    │  │
+│  │      - HEIF YCbCr planar (4:2:0/4:2:2/4:4:4)                     │  │
+│  │      - NV12, I420, GRAY ¹                                         │  │
 │  │      - 16-bit HDR images                                          │  │
-│  │        → libheif convert to 8-bit RGB first                       │  │
+│  │                                                                   │  │
+│  │    ¹ OpenVINO supports NV12/I420/GRAY natively — deferred to     │  │
+│  │      future enhancement (requires multi-plane tensor setup)       │  │
 │  └────────────────────────────┬──────────────────────────────────────┘  │
 │                               │                                         │
 │                               ▼                                         │
@@ -512,17 +511,22 @@ libheif's `convert_colorspace()` only when OpenVINO cannot.**
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Format conversion selection summary:**
+**Format conversion selection summary (initial implementation):**
 
 | Input Image Format | Who Converts | Method | Zero-Copy Input |
 |-------------------|--------------|--------|-----------------|
 | RGB interleaved u8 | — (no conversion needed) | Pass pointer directly | ✅ Yes |
 | BGR interleaved u8 | OpenVINO prepostProcessor | `set_color_format(BGR)`, `convert_color(RGB)` | ✅ Yes |
-| NV12 | OpenVINO prepostProcessor | `set_color_format(NV12)`, `convert_color(RGB)` | ✅ Yes |
-| I420 | OpenVINO prepostProcessor | `set_color_format(I420)`, `convert_color(RGB)` | ✅ Yes |
-| GRAY | OpenVINO prepostProcessor | `set_color_format(GRAY)`, `convert_color(RGB)` | ✅ Yes |
+| NV12 | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
+| I420 | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
+| GRAY | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
 | HEIF YCbCr planar (4:2:0/4:2:2/4:4:4) | libheif `convert_colorspace()` | Convert to RGB interleaved first | ❌ No (copy) |
 | 16-bit HDR | libheif `convert_colorspace()` | Convert to 8-bit RGB first | ❌ No (copy) |
+
+¹ OpenVINO prepostProcessor supports NV12, I420, and GRAY color conversion natively.
+In a future enhancement, these could be passed directly to OpenVINO for zero-copy
+processing using multi-plane tensor setup. The initial implementation uses libheif
+fallback for simplicity.
 
 #### 4.3.3 Input Preparation (HeifPixelImage → iVSR)
 
@@ -768,11 +772,12 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
     // --- Step 1: Prepare input — select best conversion path ---
-    // Format conversion selection logic:
-    //   1. OpenVINO prepostProcessor can handle: RGB, BGR, NV12, I420, GRAY
-    //      → pass pointer directly (zero-copy), set tensor_color_format accordingly
-    //   2. Formats OpenVINO cannot handle (HEIF YCbCr planar, 16-bit HDR)
+    // Format conversion selection logic (initial implementation):
+    //   1. RGB, BGR interleaved → OpenVINO prepostProcessor handles directly (zero-copy)
+    //   2. All other formats (HEIF YCbCr planar, NV12, I420, GRAY, 16-bit HDR)
     //      → fall back to libheif convert_colorspace() to RGB interleaved
+    // Note: OpenVINO can handle NV12/I420/GRAY natively, but multi-plane tensor
+    // setup is deferred to a future enhancement.
     std::shared_ptr<HeifPixelImage> converted_image;
     const char* tensor_color_format = nullptr;
     size_t in_stride;
