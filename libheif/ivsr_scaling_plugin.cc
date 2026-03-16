@@ -87,19 +87,15 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     tensor_color_format = "RGB";
     input_ptr = src_image->get_plane(heif_channel_interleaved, &in_stride);
   }
-  else if (cs == heif_colorspace_RGB &&
-           (chroma == heif_chroma_interleaved_RRGGBB_BE ||
-            chroma == heif_chroma_interleaved_RRGGBB_LE)) {
-    // OpenVINO: BGR interleaved - zero-copy, prepostProcessor converts BGR->RGB
-    tensor_color_format = "BGR";
-    input_ptr = src_image->get_plane(heif_channel_interleaved, &in_stride);
-  }
   else if (cs == heif_colorspace_YCbCr && chroma == heif_chroma_420) {
     // OpenVINO I420_THREE_PLANES path: HEIF YCbCr 4:2:0 planar has the same pixel
     // data as I420. HeifPixelImage stores Y/Cb/Cr as separate allocations, which
     // maps directly to OpenVINO's I420_THREE_PLANES mode (three separate tensors).
     // This is true zero-copy - no buffer assembly needed. OpenVINO's prepostProcessor
     // handles the I420->RGB color conversion (SIMD-optimized, potentially GPU-accelerated).
+    //
+    // Note: The iVSR API passes plane pointers through tensor descriptors.
+    // cb_plane_ptr and cr_plane_ptr are stored for use in the tensor configuration.
     input_ptr = src_image->get_plane(heif_channel_Y, &in_stride);
     cb_plane_ptr = src_image->get_plane(heif_channel_Cb, &cb_stride);
     cr_plane_ptr = src_image->get_plane(heif_channel_Cr, &cr_stride);

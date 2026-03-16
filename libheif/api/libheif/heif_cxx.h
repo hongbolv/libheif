@@ -402,10 +402,11 @@ namespace heif {
       {
         if (m_options) {
           heif_scaling_options_free(m_options);
+          m_options = nullptr;
         }
       }
 
-      // Non-copyable
+      // Non-copyable (options struct is heap-allocated)
       ScalingOptions(const ScalingOptions&) = delete;
       ScalingOptions& operator=(const ScalingOptions&) = delete;
 
@@ -419,6 +420,24 @@ namespace heif {
           m_options->ivsr_model_path = m_model_path.c_str();
           m_options->ivsr_device = m_device.c_str();
         }
+      }
+
+      ScalingOptions& operator=(ScalingOptions&& other) noexcept
+      {
+        if (this != &other) {
+          if (m_options) {
+            heif_scaling_options_free(m_options);
+          }
+          m_options = other.m_options;
+          m_model_path = std::move(other.m_model_path);
+          m_device = std::move(other.m_device);
+          other.m_options = nullptr;
+          if (m_options) {
+            m_options->ivsr_model_path = m_model_path.c_str();
+            m_options->ivsr_device = m_device.c_str();
+          }
+        }
+        return *this;
       }
 
     private:
