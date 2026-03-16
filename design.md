@@ -59,13 +59,17 @@ libheif's current scaling implementation:
 │   │ 2. iVSR Super Resolution Path                                │ │
 │   │    Used when: algorithm==super_resolution AND scale is 2×/4× │ │
 │   │    (ivsr_scaling_plugin.cc)                                   │ │
-│   │    a. Check if already RGB interleaved; if not, skip iVSR    │ │
-│   │    b. Pass RGB plane pointer directly to iVSR (zero-copy)    │ │
-│   │    c. ivsr_init() with tensor descriptors                    │ │
-│   │    d. ivsr_process() — prepostProcessor handles all format   │ │
-│   │       conversion (layout, precision, color) internally       │ │
-│   │    e. iVSR writes into pre-allocated output plane (zero-copy)│ │
-│   │    f. ivsr_deinit()                                          │ │
+│   │    a. Check input format — OpenVINO-compatible? (RGB, BGR,    │ │
+│   │       NV12, I420, GRAY)                                       │ │
+│   │       → YES: pass pointer directly (zero-copy), set tensor   │ │
+│   │         descriptor so prepostProcessor converts to RGB        │ │
+│   │       → NO (HEIF YCbCr planar, 16-bit HDR, etc.):            │ │
+│   │         libheif convert_colorspace() to RGB interleaved first │ │
+│   │    b. ivsr_init() with tensor descriptors                    │ │
+│   │    c. ivsr_process() — prepostProcessor handles all internal  │ │
+│   │       format conversion (layout, precision, color)            │ │
+│   │    d. iVSR writes into pre-allocated output plane (zero-copy)│ │
+│   │    e. ivsr_deinit()                                          │ │
 │   └──────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────┘
                                │
@@ -294,24 +298,25 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // The dispatcher guarantees target is exactly 2× or 4× of source
     int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
-    // Step 3: Verify image is RGB interleaved — required for zero-copy iVSR input.
-    // iVSR expects contiguous RGB u8 data via its input tensor descriptor.
-    // If the image is not already in this format, return an error.
-    // Callers should use libheif's convert_colorspace() beforehand if needed.
-    if (input->image->get_colorspace() != heif_colorspace_RGB ||
-        input->image->get_chroma_format() != heif_chroma_interleaved_RGB) {
-        return heif_error{heif_error_Usage_error, heif_suberror_Unsupported_color_conversion,
-                          "iVSR requires RGB interleaved input"};
-    }
-
+    // Step 3: Prepare input — select best conversion path.
+    // OpenVINO prepostProcessor can handle: RGB, BGR, NV12, I420, GRAY.
+    // For formats OpenVINO cannot handle (HEIF YCbCr planar, 16-bit HDR),
+    // fall back to libheif's convert_colorspace().
+    std::shared_ptr<HeifPixelImage> converted_image;
+    const char* tensor_color_format = nullptr;
     size_t in_stride;
-    uint8_t* input_ptr = input->image->get_plane(heif_channel_interleaved, &in_stride);
+    uint8_t* input_ptr = prepare_ivsr_input(input->image, converted_image,
+                                             &tensor_color_format, &in_stride);
+    if (!input_ptr) {
+        return error("Failed to prepare input for iVSR");
+    }
 
     // Step 4: Prepare iVSR configuration (EDSR fp32 defaults)
     // Configure tensor descriptors so prepostProcessor handles:
-    //   - Input:  NHWC u8 RGB → model's internal format
+    //   - Input:  <tensor_color_format> NHWC u8 → model's internal format
     //   - Output: model's internal format → NHWC u8 RGB
-    ivsr_config_t* configs = build_ivsr_config(options, src_width, src_height);
+    ivsr_config_t* configs = build_ivsr_config(options, src_width, src_height,
+                                                tensor_color_format);
 
     // Step 5: Initialize iVSR
     ivsr_handle handle = nullptr;
@@ -321,7 +326,8 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     }
 
     // Step 6: Run SR passes
-    // Pass HeifPixelImage plane pointers directly to iVSR — zero copy.
+    // Pass HeifPixelImage plane pointers directly to iVSR — zero copy
+    // when input is in an OpenVINO-compatible format.
     // iVSR's prepostProcessor handles all format conversions internally.
     char* current_input = (char*)input_ptr;
     int cur_w = src_width, cur_h = src_height;
@@ -349,7 +355,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
         }
     }
 
-    // Step 7: Output is already in RGB interleaved (same as input format).
+    // Step 7: Output is always RGB interleaved u8.
     // iVSR wrote directly into out_img's RGB plane buffer — no conversion needed.
     // The caller (e.g., heif_enc) handles any further colorspace conversion
     // required by the encoder (x265, SVT-HEVC, etc.).
@@ -365,60 +371,206 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 
 ### 4.3 Data Format Conversion
 
-iVSR's **prepostProcessor** handles format conversion (layout transposition, precision conversion,
-color format mapping) internally, based on the input/output tensor descriptors configured at init time.
-The libheif integration passes HeifPixelImage plane pointers directly to iVSR — **zero data copy**
-when the RGB interleaved plane is contiguous (stride == width × 3). iVSR reads from and writes to
-these buffers in-place via its prepostProcessor.
+#### 4.3.1 OpenVINO prepostProcessor Supported Formats
+
+OpenVINO's prepostProcessor (used internally by iVSR) supports the following format conversions.
+The format conversion selection logic in this integration follows the principle: **use OpenVINO's
+prepostProcessor for conversions it can handle; fall back to libheif's `convert_colorspace()` only
+for conversions OpenVINO cannot handle.**
+
+**Supported color formats** (from `ov::preprocess::ColorFormat`):
+
+| Color Format | Description | Multi-plane |
+|--------------|-------------|-------------|
+| `RGB` | RGB interleaved (3 channels) | No |
+| `BGR` | BGR interleaved (3 channels) | No |
+| `RGBX` | RGBX interleaved (4 channels, X ignored) | No |
+| `BGRX` | BGRX interleaved (4 channels, X ignored) | No |
+| `NV12_SINGLE_PLANE` | NV12 (Y + interleaved UV) as single tensor | No |
+| `NV12_TWO_PLANES` | NV12 as separate Y and UV tensors | Yes (2) |
+| `I420_SINGLE_PLANE` | I420 (YUV planar) as single tensor | No |
+| `I420_THREE_PLANES` | I420 as separate Y, U, V tensors | Yes (3) |
+| `GRAY` | Grayscale (1 channel) | No |
+
+**Supported color conversions** (via `preprocess().convert_color()`):
+
+| From → To | Supported |
+|-----------|-----------|
+| NV12 → RGB / BGR | ✅ |
+| I420 → RGB / BGR | ✅ |
+| RGB ↔ BGR | ✅ (also via `reverse_channels()`) |
+| RGBX / BGRX → RGB / BGR | ✅ |
+| GRAY → RGB / BGR | ✅ |
+| RGB / BGR → GRAY | ✅ |
+| **HEIF YCbCr planar (4:2:0/4:2:2/4:4:4) → RGB** | ❌ Not directly supported |
+
+**Supported element types** (via `set_element_type()` / `convert_element_type()`):
+
+| Type | Description |
+|------|-------------|
+| `u8` | Unsigned 8-bit integer |
+| `u16` | Unsigned 16-bit integer |
+| `f16` | IEEE 754 half-precision float |
+| `f32` | IEEE 754 single-precision float |
+| `f64` | IEEE 754 double-precision float |
+| `i8`, `i16`, `i32`, `i64` | Signed integers |
+| `bf16` | Brain floating point 16-bit |
+
+**Supported layout conversions** (via `convert_layout()`):
+
+Any layout transposition is supported (e.g., NHWC ↔ NCHW), as long as source and
+destination layouts have the same number of dimensions.
+
+**Supported preprocessing operations**:
+
+| Operation | Description |
+|-----------|-------------|
+| `convert_element_type` | Convert tensor element precision (e.g., u8 → f32) |
+| `convert_color` | Convert between supported color formats |
+| `convert_layout` | Transpose tensor dimensions (e.g., NHWC → NCHW) |
+| `scale` | Divide each element by a value (per-tensor or per-channel) |
+| `mean` | Subtract a value from each element (per-tensor or per-channel) |
+| `resize` | Resize spatial dimensions (linear, cubic, nearest, bilinear/bicubic Pillow) |
+| `crop` | Crop input tensor |
+| `clamp` | Clamp values to [min, max] range |
+| `reverse_channels` | Reverse channel order (e.g., RGB → BGR) |
+| `pad` | Pad tensor edges with constants |
+| `custom` | User-defined callback function |
+
+**Supported postprocessing operations**:
+
+| Operation | Description |
+|-----------|-------------|
+| `convert_element_type` | Convert output element precision (e.g., f32 → u8) |
+| `convert_layout` | Transpose output dimensions (e.g., NCHW → NHWC) |
+| `convert_color` | Convert output color format |
+| `clamp` | Clamp output values to [min, max] range |
+| `custom` | User-defined callback function |
+
+#### 4.3.2 Format Conversion Selection Logic (Decode → SR → Encode)
+
+The complete decode → SR → encode pipeline involves multiple format transitions. The selection
+logic follows: **use OpenVINO prepostProcessor when it can handle the conversion; fall back to
+libheif's `convert_colorspace()` only when OpenVINO cannot.**
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                Data Format Conversion Pipeline (zero-copy)            │
-│                                                                      │
-│  ┌─────────────┐    ┌─────────────────┐  ┌───────────────────────┐  │
-│  │ HeifPixel   │    │ HeifPixelImage   │  │ iVSR prepostProcessor │  │
-│  │ Image       │───►│ RGB plane pointer│─►│ (handles internally): │  │
-│  │ (RGB intlvd)│    │ (direct, no copy)│  │  - NHWC u8 → NCHW f32│  │
-│  └─────────────┘    └─────────────────┘  │  - RGB ↔ model color  │  │
-│                                           │  - normalization       │  │
-│  Format check: must be RGB interleaved.   └──────────┬────────────┘  │
-│  Returns error if not.                               │               │
-│                                              ivsr_process()          │
-│                                                      │               │
-│  ┌─────────────┐    ┌─────────────────┐  ┌──────────▼────────────┐  │
-│  │ HeifPixel   │    │ HeifPixelImage   │  │ iVSR prepostProcessor │  │
-│  │ Image       │◄───│ RGB plane pointer│◄─│ (handles internally): │  │
-│  │ (RGB intlvd)│    │ (direct, no copy)│  │  - NCHW f32 → NHWC u8│  │
-│  └─────────────┘                          │  - clamp + quantize   │  │
-│                                           └───────────────────────┘  │
-│  Output is RGB interleaved — caller handles                          │
-│  any further conversion for the encoder.                             │
-└──────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│              Decode → SR → Encode Format Conversion Pipeline            │
+│                                                                         │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │ 1. HEIF Decode Output                                            │  │
+│  │    Typical formats: YCbCr 4:2:0 planar (HEIF), RGB interleaved   │  │
+│  │    (PNG/JPEG), monochrome, YCbCr 4:2:2/4:4:4                     │  │
+│  └────────────────────────────┬──────────────────────────────────────┘  │
+│                               │                                         │
+│                               ▼                                         │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │ 2. Input Format Check & Conversion                               │  │
+│  │                                                                   │  │
+│  │    Can OpenVINO handle the input color format directly?           │  │
+│  │                                                                   │  │
+│  │    ✅ YES (OpenVINO handles it):                                  │  │
+│  │      - RGB interleaved → pass directly, zero-copy                 │  │
+│  │      - BGR interleaved → OpenVINO convert_color(BGR→RGB)          │  │
+│  │      - NV12 → OpenVINO convert_color(NV12→RGB)                   │  │
+│  │      - I420 → OpenVINO convert_color(I420→RGB)                   │  │
+│  │      - GRAY → OpenVINO convert_color(GRAY→RGB)                   │  │
+│  │                                                                   │  │
+│  │    ❌ NO (libheif fallback):                                      │  │
+│  │      - HEIF YCbCr planar (4:2:0/4:2:2/4:4:4) with separate      │  │
+│  │        Y/Cb/Cr planes and chroma subsampling                      │  │
+│  │        → libheif convert_colorspace() to RGB interleaved first    │  │
+│  │      - 16-bit HDR images                                          │  │
+│  │        → libheif convert to 8-bit RGB first                       │  │
+│  └────────────────────────────┬──────────────────────────────────────┘  │
+│                               │                                         │
+│                               ▼                                         │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │ 3. iVSR SR Processing (zero-copy)                                │  │
+│  │                                                                   │  │
+│  │    OpenVINO prepostProcessor handles internally:                  │  │
+│  │      - Input:  NHWC u8 → NCHW f32 (layout + precision)           │  │
+│  │      - Input:  RGB → model color format (if needed)               │  │
+│  │      - Input:  normalization (scale by normalize_factor)          │  │
+│  │      - Output: NCHW f32 → NHWC u8 (layout + precision)           │  │
+│  │      - Output: model color format → RGB (if needed)               │  │
+│  │      - Output: clamp + quantize to [0, 255]                       │  │
+│  │                                                                   │  │
+│  │    Input:  HeifPixelImage plane pointer → ivsr_process() input    │  │
+│  │    Output: ivsr_process() writes into pre-allocated HeifPixelImage│  │
+│  └────────────────────────────┬──────────────────────────────────────┘  │
+│                               │                                         │
+│                               ▼                                         │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │ 4. Output: RGB interleaved u8                                    │  │
+│  │    The scaling function always returns RGB interleaved.           │  │
+│  │    The caller (encoder pipeline) handles any further conversion:  │  │
+│  │      - x265 encoder → caller converts to YCbCr 4:2:0             │  │
+│  │      - SVT-HEVC encoder → caller converts to YCbCr 4:2:0         │  │
+│  │      - Other encoders → caller handles as needed                  │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 4.3.1 Input Preparation (HeifPixelImage → iVSR, zero-copy)
+**Format conversion selection summary:**
+
+| Input Image Format | Who Converts | Method | Zero-Copy Input |
+|-------------------|--------------|--------|-----------------|
+| RGB interleaved u8 | — (no conversion needed) | Pass pointer directly | ✅ Yes |
+| BGR interleaved u8 | OpenVINO prepostProcessor | `set_color_format(BGR)`, `convert_color(RGB)` | ✅ Yes |
+| NV12 | OpenVINO prepostProcessor | `set_color_format(NV12)`, `convert_color(RGB)` | ✅ Yes |
+| I420 | OpenVINO prepostProcessor | `set_color_format(I420)`, `convert_color(RGB)` | ✅ Yes |
+| GRAY | OpenVINO prepostProcessor | `set_color_format(GRAY)`, `convert_color(RGB)` | ✅ Yes |
+| HEIF YCbCr planar (4:2:0/4:2:2/4:4:4) | libheif `convert_colorspace()` | Convert to RGB interleaved first | ❌ No (copy) |
+| 16-bit HDR | libheif `convert_colorspace()` | Convert to 8-bit RGB first | ❌ No (copy) |
+
+#### 4.3.3 Input Preparation (HeifPixelImage → iVSR)
 
 ```cpp
-// Get a pointer to RGB u8 data suitable for iVSR input.
-// Returns the HeifPixelImage plane pointer directly — no data copy.
-// iVSR's prepostProcessor handles all further conversion (layout, precision,
-// color format) based on the input tensor descriptor.
+// Get a pointer to image data suitable for iVSR input.
+// Determines the best conversion path based on input format:
+//   1. OpenVINO-compatible format → pass pointer directly (zero-copy),
+//      set tensor descriptor color format so prepostProcessor handles it
+//   2. HEIF YCbCr planar → libheif convert_colorspace() to RGB first (fallback)
 //
-// Prerequisite: image must already be in heif_colorspace_RGB /
-// heif_chroma_interleaved_RGB format (via libheif's color conversion).
-// HeifPixelImage's interleaved RGB plane is contiguous (stride == width * 3)
-// because add_plane() allocates width * bytes_per_pixel per row with no
-// alignment padding for interleaved chroma formats.
-//
-// Note: ivsr_process() does not modify the input buffer.
-static uint8_t* get_ivsr_input_ptr(std::shared_ptr<HeifPixelImage>& rgb_image,
-                                    size_t* out_stride)
+// Returns the plane pointer and sets tensor_color_format for the input tensor descriptor.
+static uint8_t* prepare_ivsr_input(
+    std::shared_ptr<HeifPixelImage>& image,
+    std::shared_ptr<HeifPixelImage>& converted_image,  // holds converted image if needed
+    const char** tensor_color_format,
+    size_t* out_stride)
 {
-    return rgb_image->get_plane(heif_channel_interleaved, out_stride);
+    heif_colorspace cs = image->get_colorspace();
+    heif_chroma chroma = image->get_chroma_format();
+
+    // Path 1: OpenVINO prepostProcessor can handle these formats directly
+    if (cs == heif_colorspace_RGB && chroma == heif_chroma_interleaved_RGB) {
+        *tensor_color_format = "RGB";
+        return image->get_plane(heif_channel_interleaved, out_stride);
+    }
+    if (cs == heif_colorspace_RGB && chroma == heif_chroma_interleaved_BGR) {
+        *tensor_color_format = "BGR";
+        return image->get_plane(heif_channel_interleaved, out_stride);
+    }
+    // NV12 and I420 could also be passed directly to OpenVINO, but they
+    // require multi-plane tensor setup. For simplicity in the first step,
+    // we fall through to libheif conversion for these planar formats.
+
+    // Path 2: libheif fallback — convert to RGB interleaved
+    // Handles: HEIF YCbCr planar (4:2:0/4:2:2/4:4:4), monochrome, 16-bit, etc.
+    converted_image = convert_colorspace(image,
+                                          heif_colorspace_RGB,
+                                          heif_chroma_interleaved_RGB,
+                                          nullptr, 8, nullptr);
+    if (!converted_image) {
+        return nullptr;  // caller should return error
+    }
+    *tensor_color_format = "RGB";
+    return converted_image->get_plane(heif_channel_interleaved, out_stride);
 }
 ```
 
-#### 4.3.2 Output Handling (iVSR output → HeifPixelImage, zero-copy)
+#### 4.3.4 Output Handling (iVSR output → HeifPixelImage, zero-copy)
 
 ```cpp
 // Pre-allocate an output HeifPixelImage and return its plane pointer
@@ -436,10 +588,12 @@ static uint8_t* create_output_image_and_get_ptr(
     return out_img->get_plane(heif_channel_interleaved, out_stride);
 }
 
-// Output is RGB interleaved — same format as input (enforced by the checker).
-// No colorspace conversion is performed by the scaling function.
-// The caller (encoder pipeline) handles any further conversion needed
-// for the target codec (x265 → YCbCr 4:2:0, SVT-HEVC → YCbCr 4:2:0, etc.).
+// Output is always RGB interleaved u8 — no colorspace conversion is performed
+// by the scaling function. The caller (encoder pipeline) handles any further
+// conversion needed for the target codec:
+//   - x265 encoder: caller converts to YCbCr 4:2:0
+//   - SVT-HEVC encoder: caller converts to YCbCr 4:2:0
+//   - Other encoders: caller handles as needed
 ```
 
 ---
@@ -613,46 +767,49 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // The dispatcher guarantees target is exactly 2× or 4× of source
     int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
-    // --- Step 1: Convert to RGB interleaved 8-bit ---
-    // Use libheif's existing color conversion infrastructure
-    std::shared_ptr<HeifPixelImage> rgb_image;
-    if (src_image->get_colorspace() != heif_colorspace_RGB ||
-        src_image->get_chroma_format() != heif_chroma_interleaved_RGB) {
-        // Convert using libheif color conversion pipeline
-        // (colorconversion.h provides convert_colorspace())
-        rgb_image = convert_colorspace(src_image,
-                                        heif_colorspace_RGB,
-                                        heif_chroma_interleaved_RGB,
-                                        nullptr, /*target_profile*/
-                                        8,       /*output_bpp*/
-                                        nullptr  /*security_limits*/);
-        if (!rgb_image) {
+    // --- Step 1: Prepare input — select best conversion path ---
+    // Format conversion selection logic:
+    //   1. OpenVINO prepostProcessor can handle: RGB, BGR, NV12, I420, GRAY
+    //      → pass pointer directly (zero-copy), set tensor_color_format accordingly
+    //   2. Formats OpenVINO cannot handle (HEIF YCbCr planar, 16-bit HDR)
+    //      → fall back to libheif convert_colorspace() to RGB interleaved
+    std::shared_ptr<HeifPixelImage> converted_image;
+    const char* tensor_color_format = nullptr;
+    size_t in_stride;
+    uint8_t* input_ptr = nullptr;
+
+    heif_colorspace cs = src_image->get_colorspace();
+    heif_chroma chroma = src_image->get_chroma_format();
+
+    if (cs == heif_colorspace_RGB && chroma == heif_chroma_interleaved_RGB) {
+        // OpenVINO: RGB interleaved — zero-copy, no conversion needed
+        tensor_color_format = "RGB";
+        input_ptr = src_image->get_plane(heif_channel_interleaved, &in_stride);
+    } else if (cs == heif_colorspace_RGB && chroma == heif_chroma_interleaved_BGR) {
+        // OpenVINO: BGR interleaved — zero-copy, prepostProcessor converts BGR→RGB
+        tensor_color_format = "BGR";
+        input_ptr = src_image->get_plane(heif_channel_interleaved, &in_stride);
+    } else {
+        // libheif fallback: HEIF YCbCr planar (4:2:0/4:2:2/4:4:4), monochrome,
+        // 16-bit HDR, or other formats OpenVINO cannot handle directly.
+        // Convert to RGB interleaved using libheif's convert_colorspace().
+        converted_image = convert_colorspace(src_image,
+                                              heif_colorspace_RGB,
+                                              heif_chroma_interleaved_RGB,
+                                              nullptr, /*target_profile*/
+                                              8,       /*output_bpp*/
+                                              nullptr  /*security_limits*/);
+        if (!converted_image) {
             return {heif_error_Encoding_error, heif_suberror_Unspecified,
                     "Failed to convert image to RGB for iVSR"};
         }
-    } else {
-        rgb_image = src_image;
+        tensor_color_format = "RGB";
+        input_ptr = converted_image->get_plane(heif_channel_interleaved, &in_stride);
     }
 
-    // --- Step 2: Get RGB plane pointer directly (zero-copy input) ---
-    // No buffer allocation or data copy needed.
-    // iVSR's prepostProcessor handles color format conversion and layout
-    // transposition internally based on the tensor descriptors.
-    // We pass the HeifPixelImage plane pointer directly to iVSR.
-    //
-    // Note: ivsr_process() takes char* for both input and output. The input
-    // buffer is only read by iVSR (not modified). HeifPixelImage provides
-    // a mutable get_plane() overload for non-const objects, so no const_cast
-    // is needed when rgb_image is non-const.
-    //
-    // HeifPixelImage's interleaved RGB plane is contiguous (stride == width * 3)
-    // because add_plane() allocates width * bytes_per_pixel per row with no
-    // alignment padding for interleaved chroma formats.
-    size_t in_stride;
-    uint8_t* input_ptr = rgb_image->get_plane(heif_channel_interleaved, &in_stride);
-
-    // --- Step 3: Build iVSR configuration linked list ---
+    // --- Step 2: Build iVSR configuration linked list ---
     // Simplified for Enhanced EDSR fp32 model (no extension libs or custom ops needed)
+    // The tensor_color_format is set based on the input format check above.
     std::vector<ivsr_config_t> configs;
     auto add_config = [&configs](IVSRConfigKey key, const void* value) {
         ivsr_config_t cfg;
@@ -678,14 +835,17 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // Configure tensor descriptors for Enhanced EDSR fp32 model.
     // iVSR's prepostProcessor uses these descriptors to handle all format
     // conversions internally:
-    //   Input:  NHWC u8 RGB (what we provide) → model's expected format
+    //   Input:  NHWC u8 <tensor_color_format> (what we provide) → model's expected format
     //   Output: model's internal format → NHWC u8 RGB (what we receive)
     // This eliminates the need for manual BGR swapping, layout transposition,
     // or precision conversion in our code.
+    // tensor_color_format is set dynamically based on input format:
+    //   "RGB" if input is RGB interleaved (or converted from YCbCr)
+    //   "BGR" if input is BGR interleaved (OpenVINO handles BGR→RGB)
     tensor_desc_t input_tensor_desc = {
         .precision = "u8",
         .layout = "NHWC",
-        .tensor_color_format = "RGB",
+        .tensor_color_format = tensor_color_format,
         .model_color_format = "RGB",
         .scale = normalize_factor,  // 1.0 for EDSR
         .dimension = 4,
@@ -703,7 +863,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     add_config(INPUT_TENSOR_DESC_SETTING, &input_tensor_desc);
     add_config(OUTPUT_TENSOR_DESC_SETTING, &output_tensor_desc);
 
-    // --- Step 4: Initialize iVSR ---
+    // --- Step 3: Initialize iVSR ---
     ivsr_handle handle = nullptr;
     IVSRStatus status = ivsr_init(&configs[0], &handle);
     if (status != OK) {
@@ -711,14 +871,14 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
                 "Failed to initialize iVSR engine"};
     }
 
-    // --- Step 5: Query actual output dimensions ---
+    // --- Step 4: Query actual output dimensions ---
     tensor_desc_t actual_output_desc = {0};
     ivsr_get_attr(handle, OUTPUT_TENSOR_DESC, &actual_output_desc);
     // NHWC layout: shape = {N, H, W, C}
     int sr_height = actual_output_desc.shape[1];
     int sr_width  = actual_output_desc.shape[2];
 
-    // --- Step 6: Pre-allocate output HeifPixelImage and run inference (zero-copy) ---
+    // --- Step 5: Pre-allocate output HeifPixelImage and run inference (zero-copy) ---
     // Allocate the output image first, then pass its plane pointer directly
     // to iVSR so it writes the result in-place — no intermediate buffer.
     auto out_img = std::make_shared<HeifPixelImage>();
@@ -734,7 +894,8 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     cb.args = &completion_flag;
 
     // Pass input plane pointer and output plane pointer directly to iVSR.
-    // iVSR reads from input_ptr and writes to output_ptr — zero data copy.
+    // iVSR reads from input_ptr and writes to output_ptr — zero data copy
+    // when input is in an OpenVINO-compatible format.
     // Note: ivsr_process() does not modify the input buffer.
     status = ivsr_process(handle, reinterpret_cast<char*>(input_ptr),
                           reinterpret_cast<char*>(output_ptr), &cb);
@@ -744,20 +905,14 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
                 "iVSR processing failed"};
     }
 
-    // --- Step 7: Convert back to original colorspace if needed ---
-    // iVSR has already written directly into out_img's plane — no copy needed.
-    heif_colorspace orig_cs = src_image->get_colorspace();
-    heif_chroma orig_chroma = src_image->get_chroma_format();
-    if (orig_cs != heif_colorspace_RGB || orig_chroma != heif_chroma_interleaved_RGB) {
-        out_img = convert_colorspace(out_img, orig_cs, orig_chroma,
-                                      nullptr, 8, nullptr);
-    }
-
-    // --- Step 8: Return result ---
+    // --- Step 6: Return result ---
+    // Output is always RGB interleaved u8 — no colorspace conversion performed.
+    // The caller (encoder pipeline) handles any further conversion needed
+    // for the target codec (x265 → YCbCr 4:2:0, SVT-HEVC → YCbCr 4:2:0, etc.).
     *output = new heif_image;
     (*output)->image = std::move(out_img);
 
-    // --- Step 9: Cleanup ---
+    // --- Step 7: Cleanup ---
     ivsr_deinit(handle);
 
     return {heif_error_Ok, heif_suberror_Unspecified, "Success"};
@@ -779,8 +934,9 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 | Model file not found | Return `heif_error_Plugin_loading_error` (from iVSR init failure) |
 | iVSR init fails | Return `heif_error_Plugin_loading_error` with iVSR status |
 | iVSR inference fails | Return `heif_error_Encoding_error`, cleanup resources |
-| Unsupported color format | Convert to RGB first using libheif's color conversion |
-| HDR (16-bit) input | Convert to 8-bit RGB for iVSR, upscale, then user may re-encode |
+| RGB/BGR interleaved input | OpenVINO prepostProcessor handles directly (zero-copy) |
+| HEIF YCbCr planar input | libheif `convert_colorspace()` converts to RGB first (fallback) |
+| HDR (16-bit) input | libheif `convert_colorspace()` converts to 8-bit RGB first (fallback) |
 
 ### 7.2 Resource Safety
 
