@@ -136,10 +136,17 @@ typedef struct heif_scaling_options {
     /** Path to custom op XML config (for Enhanced BasicVSR). Optional. */
     const char* ivsr_cldnn_config;
 
-    /** Normalization factor for the model. Default: 255.0. Set to 1.0 for Enhanced EDSR. */
+    /** Normalization factor for the model. Default: 255.0.
+     *  - Set to 255.0 for Enhanced BasicVSR and most models.
+     *  - Set to 1.0 for Enhanced EDSR.
+     *  The normalize_factor must match what the model expects. */
     float ivsr_normalize_factor;
 
-    /** Scale factor of the model. Default: 2 (produces 2× output). */
+    /** Scale factor of the SR model. Default: 2 (produces 2× output).
+     *  This must match the actual model's scale factor. If the model produces
+     *  a different scale factor, the output dimensions will be incorrect.
+     *  After the SR pass, a nearest-neighbor resize is applied if the SR output
+     *  doesn't match the requested target dimensions. */
     int ivsr_scale_factor;
 } heif_scaling_options;
 
@@ -230,8 +237,13 @@ heif_error heif_image_scale_image(const heif_image* input,
                                   int width, int height,
                                   const heif_scaling_options* options)
 {
-    // Determine if this is an upscale operation
-    bool is_upscale = (width > (int)input->image->get_width() ||
+    // Determine if this is an upscale operation.
+    // Both dimensions must be >= original (at least one strictly larger) to qualify.
+    // If one dimension is larger but the other is smaller (anisotropic scaling),
+    // nearest-neighbor is used since SR models produce uniform scale factors.
+    bool is_upscale = (width >= (int)input->image->get_width() &&
+                       height >= (int)input->image->get_height()) &&
+                      (width > (int)input->image->get_width() ||
                        height > (int)input->image->get_height());
 
     // Use iVSR super resolution if:
@@ -248,6 +260,14 @@ heif_error heif_image_scale_image(const heif_image* input,
         return {heif_error_Unsupported_feature, heif_suberror_Unspecified,
                 "iVSR super resolution support not compiled in"};
 #endif
+    }
+
+    // If SR was explicitly requested but this is not an upscale, return an error
+    if (options != NULL &&
+        options->algorithm == heif_scaling_algorithm_super_resolution &&
+        !is_upscale) {
+        return {heif_error_Usage_error, heif_suberror_Unspecified,
+                "Super resolution can only be used for upscaling"};
     }
 
     // Default: nearest-neighbor scaling (existing behavior)
@@ -632,14 +652,20 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
         rgb_image = src_image;
     }
 
-    // --- Step 2: Extract contiguous RGB buffer ---
+    // --- Step 2: Extract contiguous RGB buffer and swap to BGR for iVSR ---
+    // iVSR expects BGR byte order (tensor_color_format="BGR"),
+    // while libheif's interleaved RGB stores data in R,G,B order.
     size_t in_stride;
     const uint8_t* rgb_data = rgb_image->get_plane(heif_channel_interleaved, &in_stride);
     std::vector<uint8_t> input_buffer(src_width * src_height * 3);
     for (int y = 0; y < src_height; y++) {
-        std::memcpy(input_buffer.data() + y * src_width * 3,
-                    rgb_data + y * in_stride,
-                    src_width * 3);
+        for (int x = 0; x < src_width; x++) {
+            int src_idx = y * in_stride + x * 3;
+            int dst_idx = y * src_width * 3 + x * 3;
+            input_buffer[dst_idx + 0] = rgb_data[src_idx + 2]; // B
+            input_buffer[dst_idx + 1] = rgb_data[src_idx + 1]; // G
+            input_buffer[dst_idx + 2] = rgb_data[src_idx + 0]; // R
+        }
     }
 
     // --- Step 3: Build iVSR configuration linked list ---
@@ -674,7 +700,12 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     std::string input_res = std::to_string(src_width) + "," + std::to_string(src_height);
     add_config(INPUT_RES, input_res.c_str());
 
-    // Configure tensor descriptors for single-image SR
+    // Configure tensor descriptors for single-image SR.
+    // Note: tensor_color_format="BGR" indicates the byte order of input data as fed to iVSR.
+    // model_color_format="RGB" indicates the color order expected by the model internally.
+    // iVSR handles the BGR→RGB conversion internally based on these descriptors.
+    // We provide data in BGR order from libheif's RGB interleaved format
+    // by swapping R and B channels during the input buffer copy.
     tensor_desc_t input_tensor_desc = {
         .precision = "u8",
         .layout = "NHWC",
@@ -791,7 +822,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 | Model file not found | Return `heif_error_Plugin_loading_error` (from iVSR init failure) |
 | iVSR init fails | Return `heif_error_Plugin_loading_error` with iVSR status |
 | iVSR inference fails | Return `heif_error_Encoding_error`, cleanup resources |
-| Downscale with SR algorithm | Silently fall back to nearest-neighbor (SR only for upscale) |
+| Downscale with SR algorithm | Return `heif_error_Usage_error` with a message indicating SR is only for upscaling |
 | Unsupported color format | Convert to RGB first using libheif's color conversion |
 | HDR (16-bit) input | Convert to 8-bit RGB for iVSR, upscale, then user may re-encode |
 
@@ -854,7 +885,7 @@ int main() {
     opts->algorithm = heif_scaling_algorithm_super_resolution;
     opts->ivsr_model_path = "/models/enhanced_edsr.xml";
     opts->ivsr_device = "GPU";
-    opts->ivsr_normalize_factor = 1.0;  // Enhanced EDSR uses 1.0
+    opts->ivsr_normalize_factor = 1.0;  // Enhanced EDSR requires 1.0 (overrides default 255.0)
 
     int orig_w = heif_image_get_width(image, heif_channel_interleaved);
     int orig_h = heif_image_get_height(image, heif_channel_interleaved);
