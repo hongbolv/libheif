@@ -62,9 +62,9 @@ libheif's current scaling implementation:
 │   │    a. Check input format:                                     │ │
 │   │       → RGB/BGR interleaved: pass pointer directly (zero-copy)│ │
 │   │         set tensor descriptor so prepostProcessor handles it │ │
-│   │       → YCbCr 4:2:0 (= I420 layout): assemble contiguous    │ │
-│   │         I420 buffer, OpenVINO prepostProcessor converts      │ │
-│   │         I420→RGB                                              │ │
+│   │       → YCbCr 4:2:0 (= I420 layout): pass Y/Cb/Cr plane     │ │
+│   │         pointers directly via I420_THREE_PLANES (zero-copy), │ │
+│   │         OpenVINO prepostProcessor converts I420→RGB           │ │
 │   │       → Other (YCbCr 4:2:2/4:4:4, GRAY, 16-bit HDR):        │ │
 │   │         libheif convert_colorspace() to RGB interleaved first │ │
 │   │    b. ivsr_init() with tensor descriptors                    │ │
@@ -303,14 +303,13 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // Step 3: Prepare input — select best conversion path.
     // Three paths:
     //   1. RGB/BGR interleaved → OpenVINO (zero-copy)
-    //   2. YCbCr 4:2:0 → assemble contiguous I420 buffer → OpenVINO I420→RGB
+    //   2. YCbCr 4:2:0 → pass Y/Cb/Cr planes directly via I420_THREE_PLANES
+    //      (zero-copy), OpenVINO prepostProcessor converts I420→RGB
     //   3. Other formats → libheif convert_colorspace() fallback
     std::shared_ptr<HeifPixelImage> converted_image;
-    std::vector<uint8_t> i420_buffer;
     const char* tensor_color_format = nullptr;
     size_t in_stride;
     uint8_t* input_ptr = prepare_ivsr_input(input->image, converted_image,
-                                             i420_buffer,
                                              &tensor_color_format, &in_stride);
     if (!input_ptr) {
         return error("Failed to prepare input for iVSR");
@@ -414,13 +413,18 @@ for conversions OpenVINO cannot handle.**
 >   libheif's `heif_chroma_420` with separate Y/Cb/Cr planes
 > - **NV12** (semi-planar): Y plane + interleaved UV(CbCr) plane
 >
-> OpenVINO supports both NV12 and I420 natively via `set_color_format()`. Since HEIF's YCbCr
-> 4:2:0 uses the same pixel data layout as I420, we assemble the three HeifPixelImage plane
-> allocations (Y, Cb, Cr) into one contiguous I420 buffer and pass it to OpenVINO with
-> `I420_SINGLE_PLANE` format. OpenVINO's prepostProcessor then handles the I420→RGB color
-> conversion internally. A future enhancement could use OpenVINO's `I420_THREE_PLANES` mode
-> with multi-plane tensor setup to pass the three HeifPixelImage planes directly, eliminating
-> even the buffer assembly copy.
+> OpenVINO supports both NV12 and I420 natively via `set_color_format()`, with both
+> single-plane and multi-plane variants:
+> - `I420_SINGLE_PLANE`: expects one contiguous buffer (Y + Cb + Cr)
+> - `I420_THREE_PLANES`: accepts three separate tensors for Y, U(Cb), and V(Cr) planes
+> - `NV12_SINGLE_PLANE`: expects one contiguous buffer (Y + interleaved UV)
+> - `NV12_TWO_PLANES`: accepts separate Y and UV tensors
+>
+> Since HEIF's YCbCr 4:2:0 uses the same pixel data layout as I420 and `HeifPixelImage`
+> stores the three planes as separate memory allocations, we use **`I420_THREE_PLANES`**
+> to pass the Y, Cb, Cr plane pointers directly as three separate tensors — true zero-copy
+> with no buffer assembly required. OpenVINO's prepostProcessor then handles the I420→RGB
+> color conversion internally (SIMD-optimized, potentially GPU-accelerated).
 
 **Supported element types** (via `set_element_type()` / `convert_element_type()`):
 
@@ -491,9 +495,9 @@ libheif's `convert_colorspace()` only when OpenVINO cannot.**
 │  │      - RGB interleaved → pass directly, no conversion             │  │
 │  │      - BGR interleaved → OpenVINO convert_color(BGR→RGB)          │  │
 │  │                                                                   │  │
-│  │    ✅ OpenVINO handles via I420 (buffer assembly):                 │  │
+│  │    ✅ OpenVINO handles via I420_THREE_PLANES (zero-copy):        │  │
 │  │      - HEIF YCbCr 4:2:0 planar (= I420 layout)                   │  │
-│  │        → assemble contiguous I420 buffer from Y/Cb/Cr planes      │  │
+│  │        → pass Y/Cb/Cr plane pointers as three separate tensors    │  │
 │  │        → OpenVINO convert_color(I420→RGB)                         │  │
 │  │                                                                   │  │
 │  │    ❌ libheif fallback (convert_colorspace → RGB interleaved):    │  │
@@ -539,39 +543,37 @@ libheif's `convert_colorspace()` only when OpenVINO cannot.**
 |-------------------|--------------|--------|-----------------|
 | RGB interleaved u8 | — (no conversion needed) | Pass pointer directly | ✅ Yes |
 | BGR interleaved u8 | OpenVINO prepostProcessor | `set_color_format(ColorFormat::BGR)`, `convert_color(ColorFormat::RGB)` | ✅ Yes |
-| HEIF YCbCr 4:2:0 planar (= I420 layout) | OpenVINO prepostProcessor | Assemble contiguous I420 buffer from Y/Cb/Cr planes, `set_color_format(ColorFormat::I420)`, `convert_color(ColorFormat::RGB)` | ❌ No (buffer assembly ¹) |
+| HEIF YCbCr 4:2:0 planar (= I420 layout) | OpenVINO prepostProcessor | Pass Y/Cb/Cr plane pointers as three separate tensors via `I420_THREE_PLANES`, `convert_color(ColorFormat::RGB)` | ✅ Yes (zero-copy) |
 | HEIF YCbCr 4:2:2/4:4:4 planar | libheif `convert_colorspace()` | Convert to RGB interleaved first | ❌ No (copy) |
-| GRAY / monochrome | libheif `convert_colorspace()` ² | Convert to RGB interleaved first | ❌ No (copy) |
+| GRAY / monochrome | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
 | 16-bit HDR | libheif `convert_colorspace()` | Convert to 8-bit RGB first | ❌ No (copy) |
 
-¹ HeifPixelImage stores Y, Cb, Cr as three separate memory allocations. To use OpenVINO's
-I420 color conversion, the three planes are assembled into one contiguous I420 buffer
-(Y followed by Cb followed by Cr via memcpy). This buffer assembly is cheaper than
-libheif's full YCbCr→RGB pixel conversion because it is a simple byte copy with no
-pixel math — the actual color space conversion (I420→RGB) is performed by OpenVINO's
-prepostProcessor, which is SIMD-optimized and can run on GPU. A future enhancement could
-use OpenVINO's multi-plane tensor API to pass the three HeifPixelImage planes directly,
-eliminating even the buffer assembly copy.
-
-² OpenVINO prepostProcessor supports GRAY natively. A future enhancement could use
+¹ OpenVINO prepostProcessor supports GRAY natively. A future enhancement could use
 single-channel tensor setup for zero-copy GRAY input.
 
 #### 4.3.3 Input Preparation (HeifPixelImage → iVSR)
 
 ```cpp
-// Get a pointer to image data suitable for iVSR input.
+// Get pointer(s) to image data suitable for iVSR input.
 // Determines the best conversion path based on input format:
 //   1. RGB/BGR interleaved → pass pointer directly (zero-copy)
-//   2. HEIF YCbCr 4:2:0 → assemble contiguous I420 buffer, OpenVINO converts
+//   2. HEIF YCbCr 4:2:0 → pass Y/Cb/Cr plane pointers directly via
+//      I420_THREE_PLANES (zero-copy), OpenVINO converts I420→RGB
 //   3. Other formats → libheif convert_colorspace() to RGB first (fallback)
 //
-// Returns the data pointer and sets tensor_color_format for the input tensor descriptor.
+// For paths 1 and 3, returns the data pointer via return value.
+// For path 2 (I420_THREE_PLANES), returns the Y plane pointer and sets
+// cb_plane_out/cr_plane_out for the three-plane tensor setup.
+// Sets tensor_color_format for the input tensor descriptor.
 static uint8_t* prepare_ivsr_input(
     std::shared_ptr<HeifPixelImage>& image,
     std::shared_ptr<HeifPixelImage>& converted_image,  // holds converted image if needed
-    std::vector<uint8_t>& i420_buffer,  // holds assembled I420 buffer if needed
     const char** tensor_color_format,
-    size_t* out_stride)
+    size_t* out_stride,
+    uint8_t** cb_plane_out = nullptr,  // set for I420_THREE_PLANES path
+    size_t* cb_stride_out = nullptr,
+    uint8_t** cr_plane_out = nullptr,
+    size_t* cr_stride_out = nullptr)
 {
     heif_colorspace cs = image->get_colorspace();
     heif_chroma chroma = image->get_chroma_format();
@@ -586,44 +588,27 @@ static uint8_t* prepare_ivsr_input(
         return image->get_plane(heif_channel_interleaved, out_stride);
     }
 
-    // Path 2: HEIF YCbCr 4:2:0 planar → assemble contiguous I420 buffer
-    // HEIF YCbCr 4:2:0 stores the same pixel data as I420 (separate Y/Cb/Cr planes),
-    // but HeifPixelImage uses separate allocations per plane. We assemble them into
-    // one contiguous I420 buffer (Y + Cb + Cr) and let OpenVINO's prepostProcessor
-    // handle the I420→RGB color conversion (SIMD-optimized, potentially GPU-accelerated).
+    // Path 2: HEIF YCbCr 4:2:0 planar → pass Y/Cb/Cr planes directly via I420_THREE_PLANES
+    // HEIF YCbCr 4:2:0 stores the same pixel data as I420 (separate Y/Cb/Cr planes).
+    // OpenVINO's I420_THREE_PLANES mode accepts three separate tensors (Y, U, V),
+    // which maps directly to HeifPixelImage's separate plane allocations — true zero-copy
+    // with no buffer assembly required. OpenVINO's prepostProcessor handles the I420→RGB
+    // color conversion internally (SIMD-optimized, potentially GPU-accelerated).
     if (cs == heif_colorspace_YCbCr && chroma == heif_chroma_420) {
-        size_t y_stride, cb_stride, cr_stride;
-        const uint8_t* y_plane  = image->get_plane(heif_channel_Y, &y_stride);
-        const uint8_t* cb_plane = image->get_plane(heif_channel_Cb, &cb_stride);
-        const uint8_t* cr_plane = image->get_plane(heif_channel_Cr, &cr_stride);
+        uint8_t* y_plane  = image->get_plane(heif_channel_Y, out_stride);
+        size_t cb_stride, cr_stride;
+        uint8_t* cb_plane = image->get_plane(heif_channel_Cb, &cb_stride);
+        uint8_t* cr_plane = image->get_plane(heif_channel_Cr, &cr_stride);
         if (!y_plane || !cb_plane || !cr_plane) {
             return nullptr;
         }
 
-        int w = image->get_width();
-        int h = image->get_height();
-        int chroma_w = (w + 1) / 2;
-        int chroma_h = (h + 1) / 2;
-
-        // Assemble contiguous I420 buffer: Y plane + Cb plane + Cr plane
-        size_t y_size  = (size_t)w * h;
-        size_t cb_size = (size_t)chroma_w * chroma_h;
-        size_t cr_size = cb_size;
-        i420_buffer.resize(y_size + cb_size + cr_size);
-
-        // Copy each plane row-by-row (handles stride != width)
-        for (int row = 0; row < h; row++)
-            memcpy(i420_buffer.data() + row * w, y_plane + row * y_stride, w);
-        for (int row = 0; row < chroma_h; row++)
-            memcpy(i420_buffer.data() + y_size + row * chroma_w,
-                   cb_plane + row * cb_stride, chroma_w);
-        for (int row = 0; row < chroma_h; row++)
-            memcpy(i420_buffer.data() + y_size + cb_size + row * chroma_w,
-                   cr_plane + row * cr_stride, chroma_w);
-
-        *tensor_color_format = "I420";
-        *out_stride = w;  // Y plane stride in contiguous buffer
-        return i420_buffer.data();
+        *tensor_color_format = "I420_THREE_PLANES";
+        if (cb_plane_out) *cb_plane_out = cb_plane;
+        if (cb_stride_out) *cb_stride_out = cb_stride;
+        if (cr_plane_out) *cr_plane_out = cr_plane;
+        if (cr_stride_out) *cr_stride_out = cr_stride;
+        return y_plane;  // Y plane pointer
     }
 
     // Path 3: libheif fallback — convert to RGB interleaved
@@ -840,15 +825,19 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // --- Step 1: Prepare input — select best conversion path ---
     // Format conversion selection logic:
     //   1. RGB, BGR interleaved → OpenVINO prepostProcessor handles directly (zero-copy)
-    //   2. HEIF YCbCr 4:2:0 planar → assemble contiguous I420 buffer,
-    //      OpenVINO prepostProcessor converts I420→RGB
+    //   2. HEIF YCbCr 4:2:0 planar → pass Y/Cb/Cr plane pointers directly via
+    //      I420_THREE_PLANES (zero-copy), OpenVINO prepostProcessor converts I420→RGB
     //   3. All other formats (HEIF YCbCr 4:2:2/4:4:4, GRAY, 16-bit HDR)
     //      → fall back to libheif convert_colorspace() to RGB interleaved
     std::shared_ptr<HeifPixelImage> converted_image;
-    std::vector<uint8_t> i420_buffer;
     const char* tensor_color_format = nullptr;
     size_t in_stride;
     uint8_t* input_ptr = nullptr;
+    // For I420_THREE_PLANES: separate Cb/Cr plane pointers
+    uint8_t* cb_plane_ptr = nullptr;
+    size_t cb_stride = 0;
+    uint8_t* cr_plane_ptr = nullptr;
+    size_t cr_stride = 0;
 
     heif_colorspace cs = src_image->get_colorspace();
     heif_chroma chroma = src_image->get_chroma_format();
@@ -862,38 +851,19 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
         tensor_color_format = "BGR";
         input_ptr = src_image->get_plane(heif_channel_interleaved, &in_stride);
     } else if (cs == heif_colorspace_YCbCr && chroma == heif_chroma_420) {
-        // OpenVINO I420 path: HEIF YCbCr 4:2:0 planar has the same pixel data as I420.
-        // HeifPixelImage stores Y/Cb/Cr as separate allocations, so we assemble them
-        // into one contiguous I420 buffer. OpenVINO's prepostProcessor then handles
-        // the I420→RGB color conversion (SIMD-optimized).
-        size_t y_stride, cb_stride, cr_stride;
-        const uint8_t* y_plane  = src_image->get_plane(heif_channel_Y, &y_stride);
-        const uint8_t* cb_plane = src_image->get_plane(heif_channel_Cb, &cb_stride);
-        const uint8_t* cr_plane = src_image->get_plane(heif_channel_Cr, &cr_stride);
-        if (!y_plane || !cb_plane || !cr_plane) {
+        // OpenVINO I420_THREE_PLANES path: HEIF YCbCr 4:2:0 planar has the same pixel
+        // data as I420. HeifPixelImage stores Y/Cb/Cr as separate allocations, which
+        // maps directly to OpenVINO's I420_THREE_PLANES mode (three separate tensors).
+        // This is true zero-copy — no buffer assembly needed. OpenVINO's prepostProcessor
+        // handles the I420→RGB color conversion (SIMD-optimized, potentially GPU-accelerated).
+        input_ptr = src_image->get_plane(heif_channel_Y, &in_stride);
+        cb_plane_ptr = src_image->get_plane(heif_channel_Cb, &cb_stride);
+        cr_plane_ptr = src_image->get_plane(heif_channel_Cr, &cr_stride);
+        if (!input_ptr || !cb_plane_ptr || !cr_plane_ptr) {
             return {heif_error_Encoding_error, heif_suberror_Unspecified,
                     "Failed to get YCbCr planes for iVSR"};
         }
-
-        int chroma_w = (src_width + 1) / 2;
-        int chroma_h = (src_height + 1) / 2;
-        size_t y_size  = (size_t)src_width * src_height;
-        size_t cb_size = (size_t)chroma_w * chroma_h;
-        i420_buffer.resize(y_size + cb_size + cb_size);
-
-        for (int row = 0; row < src_height; row++)
-            memcpy(i420_buffer.data() + row * src_width,
-                   y_plane + row * y_stride, src_width);
-        for (int row = 0; row < chroma_h; row++)
-            memcpy(i420_buffer.data() + y_size + row * chroma_w,
-                   cb_plane + row * cb_stride, chroma_w);
-        for (int row = 0; row < chroma_h; row++)
-            memcpy(i420_buffer.data() + y_size + cb_size + row * chroma_w,
-                   cr_plane + row * cr_stride, chroma_w);
-
-        tensor_color_format = "I420";
-        in_stride = src_width;
-        input_ptr = i420_buffer.data();
+        tensor_color_format = "I420_THREE_PLANES";
     } else {
         // libheif fallback: HEIF YCbCr 4:2:2/4:4:4 planar, monochrome,
         // 16-bit HDR, or other formats OpenVINO cannot handle directly.
@@ -1040,7 +1010,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 | iVSR init fails | Return `heif_error_Plugin_loading_error` with iVSR status |
 | iVSR inference fails | Return `heif_error_Encoding_error`, cleanup resources |
 | RGB/BGR interleaved input | OpenVINO prepostProcessor handles directly (zero-copy) |
-| HEIF YCbCr 4:2:0 planar input | Assemble contiguous I420 buffer, OpenVINO prepostProcessor converts I420→RGB |
+| HEIF YCbCr 4:2:0 planar input | Pass Y/Cb/Cr plane pointers directly via `I420_THREE_PLANES`, OpenVINO prepostProcessor converts I420→RGB (zero-copy) |
 | HEIF YCbCr 4:2:2/4:4:4 planar input | libheif `convert_colorspace()` converts to RGB first (fallback) |
 | HDR (16-bit) input | libheif `convert_colorspace()` converts to 8-bit RGB first (fallback) |
 
