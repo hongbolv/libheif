@@ -403,7 +403,19 @@ for conversions OpenVINO cannot handle.**
 | RGBX / BGRX → RGB / BGR | ✅ |
 | GRAY → RGB / BGR | ✅ |
 | RGB / BGR → GRAY | ✅ |
-| **HEIF YCbCr planar (4:2:0/4:2:2/4:4:4) → RGB** | ❌ Not directly supported |
+
+> **Note on YCbCr 4:2:0 formats:** NV12 and I420 are both YCbCr 4:2:0 chroma subsampling formats,
+> differing only in memory layout:
+> - **I420** (fully planar): Y plane + U(Cb) plane + V(Cr) plane — same pixel arrangement as
+>   libheif's `heif_chroma_420` with separate Y/Cb/Cr planes
+> - **NV12** (semi-planar): Y plane + interleaved UV(CbCr) plane
+>
+> OpenVINO supports both NV12 and I420 natively via `set_color_format()`. However, libheif's
+> internal `HeifPixelImage` stores YCbCr 4:2:0 as three separate plane objects (accessed via
+> `get_plane(heif_channel_Y)`, `get_plane(heif_channel_Cb)`, `get_plane(heif_channel_Cr)`),
+> which requires multi-plane tensor setup to pass directly to OpenVINO. The initial implementation
+> uses libheif's `convert_colorspace()` to convert to RGB interleaved first. A future enhancement
+> could map HeifPixelImage's three planes directly to OpenVINO's I420 multi-plane tensor input.
 
 **Supported element types** (via `set_element_type()` / `convert_element_type()`):
 
@@ -475,11 +487,13 @@ libheif's `convert_colorspace()` only when OpenVINO cannot.**
 │  │      - BGR interleaved → OpenVINO convert_color(BGR→RGB)          │  │
 │  │                                                                   │  │
 │  │    ❌ libheif fallback (convert_colorspace → RGB interleaved):    │  │
-│  │      - HEIF YCbCr planar (4:2:0/4:2:2/4:4:4)                     │  │
-│  │      - NV12, I420, GRAY ¹                                         │  │
+│  │      - HEIF YCbCr 4:2:0 planar (= I420 layout) ¹                │  │
+│  │      - HEIF YCbCr 4:2:2/4:4:4 planar                             │  │
+│  │      - GRAY / monochrome ¹                                        │  │
 │  │      - 16-bit HDR images                                          │  │
 │  │                                                                   │  │
-│  │    ¹ OpenVINO supports NV12/I420/GRAY natively — deferred to     │  │
+│  │    ¹ OpenVINO supports I420/NV12/GRAY natively, but HEIF's        │  │
+│  │      YCbCr 4:2:0 uses same pixel layout as I420 — deferred to    │  │
 │  │      future enhancement (requires multi-plane tensor setup)       │  │
 │  └────────────────────────────┬──────────────────────────────────────┘  │
 │                               │                                         │
@@ -517,16 +531,17 @@ libheif's `convert_colorspace()` only when OpenVINO cannot.**
 |-------------------|--------------|--------|-----------------|
 | RGB interleaved u8 | — (no conversion needed) | Pass pointer directly | ✅ Yes |
 | BGR interleaved u8 | OpenVINO prepostProcessor | `set_color_format(ColorFormat::BGR)`, `convert_color(ColorFormat::RGB)` | ✅ Yes |
-| NV12 | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
-| I420 | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
-| GRAY | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
-| HEIF YCbCr planar (4:2:0/4:2:2/4:4:4) | libheif `convert_colorspace()` | Convert to RGB interleaved first | ❌ No (copy) |
+| HEIF YCbCr 4:2:0 planar (= I420 layout) ¹ | libheif `convert_colorspace()` | Convert to RGB interleaved first | ❌ No (copy) |
+| HEIF YCbCr 4:2:2/4:4:4 planar | libheif `convert_colorspace()` | Convert to RGB interleaved first | ❌ No (copy) |
+| GRAY / monochrome | libheif `convert_colorspace()` ¹ | Convert to RGB interleaved first | ❌ No (copy) |
 | 16-bit HDR | libheif `convert_colorspace()` | Convert to 8-bit RGB first | ❌ No (copy) |
 
-¹ OpenVINO prepostProcessor supports NV12, I420, and GRAY color conversion natively.
-In a future enhancement, these could be passed directly to OpenVINO for zero-copy
-processing using multi-plane tensor setup. The initial implementation uses libheif
-fallback for simplicity.
+¹ OpenVINO prepostProcessor supports I420, NV12, and GRAY color conversion natively.
+HEIF's YCbCr 4:2:0 planar format stores the same pixel data as I420 (separate Y/Cb/Cr planes),
+but libheif's `HeifPixelImage` manages planes as separate objects. Passing them directly to
+OpenVINO would require multi-plane tensor setup. The initial implementation uses libheif's
+`convert_colorspace()` fallback for simplicity; a future enhancement could map the three
+HeifPixelImage planes directly to OpenVINO's I420 input for zero-copy processing.
 
 #### 4.3.3 Input Preparation (HeifPixelImage → iVSR)
 
@@ -556,12 +571,15 @@ static uint8_t* prepare_ivsr_input(
         *tensor_color_format = "BGR";
         return image->get_plane(heif_channel_interleaved, out_stride);
     }
-    // NV12 and I420 could also be passed directly to OpenVINO, but they
-    // require multi-plane tensor setup. For simplicity in the first step,
-    // we fall through to libheif conversion for these planar formats.
+    // HEIF YCbCr 4:2:0 planar uses the same pixel arrangement as I420
+    // (separate Y/Cb/Cr planes). OpenVINO supports I420 natively, but
+    // HeifPixelImage stores planes as separate objects requiring multi-plane
+    // tensor setup. For simplicity in the initial implementation, we fall
+    // through to libheif conversion for all YCbCr planar formats.
 
     // Path 2: libheif fallback — convert to RGB interleaved
-    // Handles: HEIF YCbCr planar (4:2:0/4:2:2/4:4:4), monochrome, 16-bit, etc.
+    // Handles: HEIF YCbCr planar (4:2:0 = I420 layout, 4:2:2, 4:4:4),
+    //          monochrome, 16-bit HDR, etc.
     converted_image = convert_colorspace(image,
                                           heif_colorspace_RGB,
                                           heif_chroma_interleaved_RGB,
