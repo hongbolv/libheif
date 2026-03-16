@@ -293,9 +293,11 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     // The dispatcher guarantees target is exactly 2× or 4× of source
     int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
-    // Step 3: Convert HeifPixelImage to contiguous RGB u8 buffer
-    // (iVSR's prepostProcessor handles further format conversion internally)
-    std::vector<uint8_t> rgb_input = heif_to_contiguous_rgb(input);
+    // Step 3: Convert HeifPixelImage to RGB interleaved (if needed)
+    // and get the plane pointer directly — no data copy
+    auto rgb_image = convert_to_rgb_interleaved(input);
+    size_t in_stride;
+    uint8_t* input_ptr = rgb_image->get_plane(heif_channel_interleaved, &in_stride);
 
     // Step 4: Prepare iVSR configuration (EDSR fp32 defaults)
     // Configure tensor descriptors so prepostProcessor handles:
@@ -311,40 +313,42 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     }
 
     // Step 6: Run SR passes
-    // iVSR's prepostProcessor handles all format conversions (layout, precision,
-    // color) internally — we just pass RGB u8 in and receive RGB u8 out.
-    uint8_t* current_input = rgb_input.data();
-    uint8_t* current_output = nullptr;
+    // Pass HeifPixelImage plane pointers directly to iVSR — zero copy.
+    // iVSR's prepostProcessor handles all format conversions internally.
+    char* current_input = (char*)input_ptr;
     int cur_w = src_width, cur_h = src_height;
 
+    // Pre-allocate output HeifPixelImage and pass its plane pointer to iVSR
+    std::shared_ptr<HeifPixelImage> out_img;
     for (int pass = 0; pass < num_passes; pass++) {
         int out_w = cur_w * 2, out_h = cur_h * 2;
-        size_t output_size = out_w * out_h * 3;  // RGB u8 in NHWC layout
-        current_output = allocate_buffer(output_size);
+        size_t out_stride;
+        uint8_t* output_ptr = create_output_image_and_get_ptr(out_img,
+                                                               out_w, out_h, &out_stride);
 
         ivsr_cb_t cb = {completion_callback, &cb_args};
-        status = ivsr_process(handle, current_input, current_output, &cb);
+        status = ivsr_process(handle, current_input, (char*)output_ptr, &cb);
         if (status != OK) {
             ivsr_deinit(handle);
             return error("iVSR processing failed");
         }
 
-        // For second pass, use output of first pass as input
+        // For second pass (4×), use output image plane as next input
         if (pass < num_passes - 1) {
-            current_input = current_output;
+            current_input = (char*)output_ptr;
             cur_w = out_w;
             cur_h = out_h;
         }
     }
 
-    // Step 7: Copy iVSR output (NHWC u8 RGB, from prepostProcessor) to HeifPixelImage
-    *output = copy_rgb_u8_to_heif_image(current_output, target_width, target_height,
-                                         input->image->get_colorspace(),
-                                         input->image->get_chroma_format());
+    // Step 7: Convert back to original colorspace if needed (no data copy from iVSR)
+    // iVSR already wrote directly into out_img's plane buffer
+    *output = finalize_output(out_img,
+                              input->image->get_colorspace(),
+                              input->image->get_chroma_format());
 
     // Step 8: Cleanup
     ivsr_deinit(handle);
-    free_buffer(current_output);
     free_ivsr_configs(configs);
 
     return heif_error_ok;
@@ -355,94 +359,85 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 
 iVSR's **prepostProcessor** handles format conversion (layout transposition, precision conversion,
 color format mapping) internally, based on the input/output tensor descriptors configured at init time.
-The libheif integration only needs to provide contiguous RGB u8 data and receive RGB u8 output.
+The libheif integration passes HeifPixelImage plane pointers directly to iVSR — **zero data copy**
+when the RGB interleaved plane is contiguous (stride == width × 3). iVSR reads from and writes to
+these buffers in-place via its prepostProcessor.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│                     Data Format Conversion Pipeline                   │
+│                Data Format Conversion Pipeline (zero-copy)            │
 │                                                                      │
-│  ┌─────────────┐    ┌─────────────┐    ┌──────────────────────────┐ │
-│  │ HeifPixel   │    │ RGB 8-bit   │    │ iVSR prepostProcessor    │ │
-│  │ Image       │───►│ Interleaved │───►│ (handles internally):    │ │
-│  │ (any format)│    │ (HWC u8)    │    │  - NHWC u8 → NCHW fp32  │ │
-│  └─────────────┘    └─────────────┘    │  - RGB ↔ model color fmt │ │
-│                                         │  - normalization by scale │ │
-│  libheif color-conversion/              └──────────┬───────────────┘ │
-│  already supports all needed                       │                 │
-│  conversions (YCbCr→RGB, etc.)              ivsr_process()           │
-│                                                    │                 │
-│  ┌─────────────┐    ┌─────────────┐    ┌──────────▼───────────────┐ │
-│  │ HeifPixel   │    │ RGB 8-bit   │    │ iVSR prepostProcessor    │ │
-│  │ Image       │◄───│ Interleaved │◄───│ (handles internally):    │ │
-│  │ (original   │    │ (HWC u8)    │    │  - NCHW fp32 → NHWC u8  │ │
-│  │  format)    │    └─────────────┘    │  - clamp + quantize      │ │
-│  └─────────────┘                        └──────────────────────────┘ │
+│  ┌─────────────┐    ┌─────────────────┐  ┌───────────────────────┐  │
+│  │ HeifPixel   │    │ HeifPixelImage   │  │ iVSR prepostProcessor │  │
+│  │ Image       │───►│ RGB plane pointer│─►│ (handles internally): │  │
+│  │ (any format)│    │ (direct, no copy)│  │  - NHWC u8 → NCHW f32│  │
+│  └─────────────┘    └─────────────────┘  │  - RGB ↔ model color  │  │
+│                                           │  - normalization       │  │
+│  libheif color-conversion/                └──────────┬────────────┘  │
+│  converts to RGB interleaved                         │               │
+│  (YCbCr→RGB, etc.)                           ivsr_process()          │
+│                                                      │               │
+│  ┌─────────────┐    ┌─────────────────┐  ┌──────────▼────────────┐  │
+│  │ HeifPixel   │    │ HeifPixelImage   │  │ iVSR prepostProcessor │  │
+│  │ Image       │◄───│ RGB plane pointer│◄─│ (handles internally): │  │
+│  │ (original   │    │ (direct, no copy)│  │  - NCHW f32 → NHWC u8│  │
+│  │  format)    │    └─────────────────┘  │  - clamp + quantize   │  │
+│  └─────────────┘                          └───────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 4.3.1 Input Preparation (HeifPixelImage → contiguous RGB u8)
+#### 4.3.1 Input Preparation (HeifPixelImage → iVSR, zero-copy)
 
 ```cpp
-// Convert any HeifPixelImage to contiguous RGB u8 buffer for iVSR input.
-// iVSR's prepostProcessor handles further conversion (layout, precision,
+// Get a pointer to RGB u8 data suitable for iVSR input.
+// Returns the HeifPixelImage plane pointer directly — no data copy.
+// iVSR's prepostProcessor handles all further conversion (layout, precision,
 // color format) based on the input tensor descriptor.
-static std::vector<uint8_t> heif_to_ivsr_input(const HeifPixelImage& image) {
-    // Use libheif's existing color conversion infrastructure
-    // to convert any colorspace to heif_colorspace_RGB + heif_chroma_interleaved_RGB
-
-    auto rgb_image = convert_colorspace(image,
-                                         heif_colorspace_RGB,
-                                         heif_chroma_interleaved_RGB,
-                                         nullptr, 8, nullptr);
-
-    size_t stride;
-    const uint8_t* data = rgb_image->get_plane(heif_channel_interleaved, &stride);
-
-    int width = rgb_image->get_width();
-    int height = rgb_image->get_height();
-
-    // Copy to contiguous buffer (remove any stride padding)
-    std::vector<uint8_t> buffer(width * height * 3);
-    for (int y = 0; y < height; y++) {
-        memcpy(buffer.data() + y * width * 3, data + y * stride, width * 3);
-    }
-    return buffer;
+//
+// Prerequisite: image must already be in heif_colorspace_RGB /
+// heif_chroma_interleaved_RGB format (via libheif's color conversion).
+// HeifPixelImage's interleaved RGB plane is contiguous (stride == width * 3)
+// because add_plane() allocates width * bytes_per_pixel per row with no
+// alignment padding for interleaved chroma formats.
+//
+// Note: ivsr_process() does not modify the input buffer.
+static uint8_t* get_ivsr_input_ptr(std::shared_ptr<HeifPixelImage>& rgb_image,
+                                    size_t* out_stride)
+{
+    return rgb_image->get_plane(heif_channel_interleaved, out_stride);
 }
 ```
 
-#### 4.3.2 Output Handling (iVSR output → HeifPixelImage)
+#### 4.3.2 Output Handling (iVSR output → HeifPixelImage, zero-copy)
 
 ```cpp
-// Convert iVSR output (contiguous RGB u8, produced by prepostProcessor)
-// back to HeifPixelImage.
+// Pre-allocate an output HeifPixelImage and return its plane pointer
+// so iVSR can write directly into it — no intermediate buffer or copy.
 // iVSR's prepostProcessor already handles NCHW fp32 → NHWC u8 conversion
 // and clamping based on the output tensor descriptor.
-static std::shared_ptr<HeifPixelImage> ivsr_output_to_heif(
-    const uint8_t* rgb_data, int width, int height,
+static uint8_t* create_output_image_and_get_ptr(
+    std::shared_ptr<HeifPixelImage>& out_img,
+    int width, int height, size_t* out_stride)
+{
+    out_img = std::make_shared<HeifPixelImage>();
+    out_img->create(width, height, heif_colorspace_RGB, heif_chroma_interleaved_RGB);
+    out_img->add_plane(heif_channel_interleaved, width, height, 8, nullptr);
+
+    return out_img->get_plane(heif_channel_interleaved, out_stride);
+}
+
+// After iVSR writes into the output plane, convert to target colorspace if needed.
+static std::shared_ptr<HeifPixelImage> finalize_output(
+    std::shared_ptr<HeifPixelImage> out_img,
     heif_colorspace target_colorspace,
     heif_chroma target_chroma)
 {
-    // Step 1: Create RGB interleaved image from iVSR output
-    auto img = std::make_shared<HeifPixelImage>();
-    img->create(width, height, heif_colorspace_RGB, heif_chroma_interleaved_RGB);
-    img->add_plane(heif_channel_interleaved, width, height, 8, nullptr);
-
-    size_t stride;
-    uint8_t* out = img->get_plane(heif_channel_interleaved, &stride);
-
-    // Copy contiguous RGB data into HeifPixelImage (accounting for stride)
-    for (int y = 0; y < height; y++) {
-        memcpy(out + y * stride, rgb_data + y * width * 3, width * 3);
-    }
-
-    // Step 2: Convert to target colorspace if needed
     if (target_colorspace != heif_colorspace_RGB ||
         target_chroma != heif_chroma_interleaved_RGB) {
-        img = convert_colorspace(img, target_colorspace, target_chroma,
-                                  nullptr, 8, nullptr);
+        out_img = convert_colorspace(out_img, target_colorspace, target_chroma,
+                                      nullptr, 8, nullptr);
     }
-
-    return img;
+    return out_img;
 }
 ```
 
@@ -638,17 +633,22 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
         rgb_image = src_image;
     }
 
-    // --- Step 2: Extract contiguous RGB u8 buffer ---
-    // No manual BGR swap or layout conversion needed:
+    // --- Step 2: Get RGB plane pointer directly (zero-copy input) ---
+    // No buffer allocation or data copy needed.
     // iVSR's prepostProcessor handles color format conversion and layout
     // transposition internally based on the tensor descriptors.
+    // We pass the HeifPixelImage plane pointer directly to iVSR.
+    //
+    // Note: ivsr_process() takes char* for both input and output. The input
+    // buffer is only read by iVSR (not modified). HeifPixelImage provides
+    // a mutable get_plane() overload for non-const objects, so no const_cast
+    // is needed when rgb_image is non-const.
+    //
+    // HeifPixelImage's interleaved RGB plane is contiguous (stride == width * 3)
+    // because add_plane() allocates width * bytes_per_pixel per row with no
+    // alignment padding for interleaved chroma formats.
     size_t in_stride;
-    const uint8_t* rgb_data = rgb_image->get_plane(heif_channel_interleaved, &in_stride);
-    std::vector<uint8_t> input_buffer(src_width * src_height * 3);
-    for (int y = 0; y < src_height; y++) {
-        memcpy(input_buffer.data() + y * src_width * 3,
-               rgb_data + y * in_stride, src_width * 3);
-    }
+    uint8_t* input_ptr = rgb_image->get_plane(heif_channel_interleaved, &in_stride);
 
     // --- Step 3: Build iVSR configuration linked list ---
     // Simplified for Enhanced EDSR fp32 model (no extension libs or custom ops needed)
@@ -717,38 +717,34 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     int sr_height = actual_output_desc.shape[1];
     int sr_width  = actual_output_desc.shape[2];
 
-    // --- Step 6: Allocate output buffer and run inference ---
-    // Output is NHWC u8 RGB (prepostProcessor handles NCHW fp32 → NHWC u8)
-    std::vector<uint8_t> output_buffer(sr_width * sr_height * 3, 0);
+    // --- Step 6: Pre-allocate output HeifPixelImage and run inference (zero-copy) ---
+    // Allocate the output image first, then pass its plane pointer directly
+    // to iVSR so it writes the result in-place — no intermediate buffer.
+    auto out_img = std::make_shared<HeifPixelImage>();
+    out_img->create(sr_width, sr_height, heif_colorspace_RGB, heif_chroma_interleaved_RGB);
+    out_img->add_plane(heif_channel_interleaved, sr_width, sr_height, 8, nullptr);
+
+    size_t out_stride;
+    uint8_t* output_ptr = out_img->get_plane(heif_channel_interleaved, &out_stride);
 
     int completion_flag = 0;
     ivsr_cb_t cb;
     cb.ivsr_cb = ivsr_completion_callback;
     cb.args = &completion_flag;
 
-    status = ivsr_process(handle, reinterpret_cast<char*>(input_buffer.data()),
-                          reinterpret_cast<char*>(output_buffer.data()), &cb);
+    // Pass input plane pointer and output plane pointer directly to iVSR.
+    // iVSR reads from input_ptr and writes to output_ptr — zero data copy.
+    // Note: ivsr_process() does not modify the input buffer.
+    status = ivsr_process(handle, reinterpret_cast<char*>(input_ptr),
+                          reinterpret_cast<char*>(output_ptr), &cb);
     if (status != OK) {
         ivsr_deinit(handle);
         return {heif_error_Encoding_error, heif_suberror_Unspecified,
                 "iVSR processing failed"};
     }
 
-    // --- Step 7: Copy NHWC u8 output to HeifPixelImage ---
-    // iVSR's prepostProcessor already converted NCHW fp32 → NHWC u8 RGB
-    auto out_img = std::make_shared<HeifPixelImage>();
-    out_img->create(sr_width, sr_height, heif_colorspace_RGB, heif_chroma_interleaved_RGB);
-    out_img->add_plane(heif_channel_interleaved, sr_width, sr_height, 8, nullptr);
-
-    size_t out_stride;
-    uint8_t* out_data = out_img->get_plane(heif_channel_interleaved, &out_stride);
-
-    for (int y = 0; y < sr_height; y++) {
-        memcpy(out_data + y * out_stride,
-               output_buffer.data() + y * sr_width * 3, sr_width * 3);
-    }
-
-    // --- Step 8: Convert back to original colorspace if needed ---
+    // --- Step 7: Convert back to original colorspace if needed ---
+    // iVSR has already written directly into out_img's plane — no copy needed.
     heif_colorspace orig_cs = src_image->get_colorspace();
     heif_chroma orig_chroma = src_image->get_chroma_format();
     if (orig_cs != heif_colorspace_RGB || orig_chroma != heif_chroma_interleaved_RGB) {
@@ -756,12 +752,11 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
                                       nullptr, 8, nullptr);
     }
 
-    // --- Step 9: Return result ---
-    // No fallback resize needed — the dispatcher guarantees exact 2× or 4× scaling
+    // --- Step 8: Return result ---
     *output = new heif_image;
     (*output)->image = std::move(out_img);
 
-    // --- Step 10: Cleanup ---
+    // --- Step 9: Cleanup ---
     ivsr_deinit(handle);
 
     return {heif_error_Ok, heif_suberror_Unspecified, "Success"};
