@@ -257,9 +257,66 @@ uint8_t* heif_image_get_plane2(heif_image*,
                                size_t* out_stride);
 
 
-typedef struct heif_scaling_options heif_scaling_options;
+/**
+ * @brief Scaling algorithm selection.
+ */
+enum heif_scaling_algorithm {
+    /** Nearest-neighbor interpolation (default, fastest). */
+    heif_scaling_algorithm_nearest_neighbor = 0,
 
-// Currently, heif_scaling_options is not defined yet. Pass a NULL pointer.
+    /** AI-based super resolution using iVSR (best quality for 2x/4x upscaling). */
+    heif_scaling_algorithm_super_resolution = 1
+};
+
+/**
+ * @brief Options for image scaling.
+ *
+ * Use heif_scaling_options_alloc() to create and
+ * heif_scaling_options_free() to release.
+ *
+ * Pass NULL for default nearest-neighbor scaling (backward compatible).
+ */
+typedef struct heif_scaling_options {
+    /** Version of this struct for future extensibility. Must be 1. */
+    int version;
+
+    /** Scaling algorithm to use. Default: heif_scaling_algorithm_nearest_neighbor */
+    enum heif_scaling_algorithm algorithm;
+
+    /**
+     * iVSR configuration (only used when algorithm == heif_scaling_algorithm_super_resolution).
+     * All fields below are ignored for other algorithms.
+     *
+     * The default configuration targets Enhanced EDSR fp32 model.
+     */
+
+    /** Path to the Enhanced EDSR OpenVINO IR model file (.xml). Required for SR. */
+    const char* ivsr_model_path;
+
+    /** Target device for inference. Default: "CPU". Options: "CPU", "GPU" */
+    const char* ivsr_device;
+} heif_scaling_options;
+
+/**
+ * @brief Allocate scaling options with default values.
+ *
+ * Default values:
+ *   - algorithm: heif_scaling_algorithm_nearest_neighbor
+ *   - ivsr_model_path: NULL
+ *   - ivsr_device: "CPU"
+ *
+ * @return Pointer to allocated options, or NULL on failure.
+ *         Must be freed with heif_scaling_options_free().
+ */
+LIBHEIF_API
+heif_scaling_options* heif_scaling_options_alloc(void);
+
+/**
+ * @brief Free scaling options allocated by heif_scaling_options_alloc().
+ */
+LIBHEIF_API
+void heif_scaling_options_free(heif_scaling_options* options);
+
 LIBHEIF_API
 heif_error heif_image_scale_image(const heif_image* input,
                                   heif_image** output,

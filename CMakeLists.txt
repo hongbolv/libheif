@@ -313,6 +313,23 @@ if (WITH_WEBCODECS)
    set(WEBCODECS_FOUND TRUE) # There is no library for web-codecs. Always mark as found.
 endif()
 
+# iVSR super resolution
+
+option(WITH_IVSR "Build with iVSR super resolution support" OFF)
+
+if (WITH_IVSR)
+    find_library(IVSR_LIBRARY NAMES ivsr PATHS ${IVSR_SDK_PATH}/lib)
+    find_path(IVSR_INCLUDE_DIR NAMES ivsr.h PATHS ${IVSR_SDK_PATH}/include)
+
+    if (IVSR_LIBRARY AND IVSR_INCLUDE_DIR)
+        message(STATUS "iVSR SDK found: ${IVSR_LIBRARY}")
+        set(HAVE_IVSR ON)
+    else()
+        message(WARNING "iVSR SDK not found. Building without super resolution support.")
+        set(HAVE_IVSR OFF)
+    endif()
+endif()
+
 # --- show codec compilation summary
 
 message("\n=== Summary of compiled codecs ===")

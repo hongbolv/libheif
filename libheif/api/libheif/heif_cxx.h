@@ -374,6 +374,57 @@ namespace heif {
 
     class ScalingOptions
     {
+    public:
+      enum Algorithm {
+        NearestNeighbor = heif_scaling_algorithm_nearest_neighbor,
+        SuperResolution = heif_scaling_algorithm_super_resolution
+      };
+
+      ScalingOptions() : m_options(nullptr) {}
+
+      /** Configure for AI super resolution using Enhanced EDSR fp32 model. */
+      void set_super_resolution(const std::string& model_path,
+                                const std::string& device = "CPU")
+      {
+        if (!m_options) {
+          m_options = heif_scaling_options_alloc();
+        }
+        m_options->algorithm = heif_scaling_algorithm_super_resolution;
+        m_model_path = model_path;
+        m_device = device;
+        m_options->ivsr_model_path = m_model_path.c_str();
+        m_options->ivsr_device = m_device.c_str();
+      }
+
+      const heif_scaling_options* get_c_options() const { return m_options; }
+
+      ~ScalingOptions()
+      {
+        if (m_options) {
+          heif_scaling_options_free(m_options);
+        }
+      }
+
+      // Non-copyable
+      ScalingOptions(const ScalingOptions&) = delete;
+      ScalingOptions& operator=(const ScalingOptions&) = delete;
+
+      // Movable
+      ScalingOptions(ScalingOptions&& other) noexcept
+        : m_options(other.m_options), m_model_path(std::move(other.m_model_path)),
+          m_device(std::move(other.m_device))
+      {
+        other.m_options = nullptr;
+        if (m_options) {
+          m_options->ivsr_model_path = m_model_path.c_str();
+          m_options->ivsr_device = m_device.c_str();
+        }
+      }
+
+    private:
+      heif_scaling_options* m_options;
+      std::string m_model_path;
+      std::string m_device;
     };
 
     // throws Error
@@ -1009,11 +1060,11 @@ namespace heif {
   }
 
   inline Image Image::scale_image(int width, int height,
-                                  const ScalingOptions&) const
+                                  const ScalingOptions& options) const
   {
     heif_image* img;
     Error err = Error(heif_image_scale_image(m_image.get(), &img, width, height,
-                                             nullptr)); // TODO: scaling options not defined yet
+                                             options.get_c_options()));
     if (err) {
       throw err;
     }

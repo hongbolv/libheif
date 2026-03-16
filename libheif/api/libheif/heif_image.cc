@@ -31,6 +31,10 @@
 #include <cstring>
 #include <array>
 
+#if HAVE_IVSR
+#include "ivsr_scaling_plugin.h"
+#endif
+
 
 heif_colorspace heif_image_get_colorspace(const heif_image* img)
 {
@@ -229,11 +233,55 @@ uint8_t* heif_image_get_plane2(heif_image* image,
 }
 
 
+heif_scaling_options* heif_scaling_options_alloc(void)
+{
+  auto* options = new heif_scaling_options;
+  options->version = 1;
+  options->algorithm = heif_scaling_algorithm_nearest_neighbor;
+  options->ivsr_model_path = nullptr;
+  options->ivsr_device = "CPU";
+  return options;
+}
+
+
+void heif_scaling_options_free(heif_scaling_options* options)
+{
+  delete options;
+}
+
+
 heif_error heif_image_scale_image(const heif_image* input,
                                   heif_image** output,
                                   int width, int height,
                                   const heif_scaling_options* options)
 {
+  int src_w = static_cast<int>(input->image->get_width());
+  int src_h = static_cast<int>(input->image->get_height());
+
+  // --- Algorithm selection (all decisions made here, no fallback later) ---
+
+  if (options != nullptr &&
+      options->algorithm == heif_scaling_algorithm_super_resolution) {
+
+    // iVSR only supports exact 2x or 4x upscaling
+    bool is_2x = (width == src_w * 2 && height == src_h * 2);
+    bool is_4x = (width == src_w * 4 && height == src_h * 4);
+
+    if (is_2x || is_4x) {
+#if HAVE_IVSR
+      // Dispatch to iVSR super resolution
+      // For 4x: internally runs two passes of 2x SR
+      return heif_image_scale_with_ivsr(input, output, width, height, options);
+#else
+      return {heif_error_Unsupported_feature, heif_suberror_Unspecified,
+              "iVSR super resolution support not compiled in"};
+#endif
+    }
+
+    // For non-2x/4x scale factors, fall through to nearest-neighbor
+  }
+
+  // Default: nearest-neighbor scaling (existing behavior)
   std::shared_ptr<HeifPixelImage> out_img;
 
   Error err = input->image->scale_nearest_neighbor(out_img, width, height, nullptr);

@@ -139,6 +139,9 @@ std::vector<heif_brand2> additional_compatible_brands;
 int scale_width = 0;
 int scale_height = 0;
 
+std::string sr_model_path;
+std::string sr_device = "CPU";
+
 enum heif_output_nclx_color_profile_preset
 {
   heif_output_nclx_color_profile_preset_custom,  // Default. Use the values provided by the user.
@@ -210,6 +213,8 @@ const int OPTION_SET_OMAF_IMAGE_PROJECTION = 1038;
 const int OPTION_ADD_COMPATIBLE_BRAND = 1039;
 const int OPTION_UNIF = 1040;
 const int OPTION_SCALE = 1041;
+const int OPTION_SR_MODEL = 1042;
+const int OPTION_SR_DEVICE = 1043;
 
 static option long_options[] = {
     {(char* const) "help",                    no_argument,       0,              'h'},
@@ -284,6 +289,8 @@ static option long_options[] = {
     {(char* const) "add-compatible-brand",        required_argument,       nullptr, OPTION_ADD_COMPATIBLE_BRAND},
     {(char* const) "unif",                      no_argument,             nullptr, OPTION_UNIF},
     {(char* const) "scale",                     required_argument,       nullptr, OPTION_SCALE},
+    {(char* const) "sr-model",                  required_argument,       nullptr, OPTION_SR_MODEL},
+    {(char* const) "sr-device",                 required_argument,       nullptr, OPTION_SR_DEVICE},
     {0, 0,                                                           0,  0}
 };
 
@@ -322,6 +329,8 @@ void show_help(const char* argv0)
             << "  -b, --bit-depth #              number of bits to use from an 16-bit PNG input, valid range: 9-16 (default: 10 bit)\n"
             << "      --premultiplied-alpha      input image has premultiplied alpha\n"
             << "      --scale WxH                scale the input image to the specified width and height before encoding\n"
+            << "      --sr-model <path>          path to Enhanced EDSR OpenVINO IR model (.xml); enables super resolution for --scale\n"
+            << "      --sr-device <device>       device for SR inference: CPU (default) or GPU\n"
 #if WITH_HEADER_COMPRESSION
             << "      --enable-metadata-compression ALGO  enable metadata item compression (experimental)\n"
             << "                                          Choose algorithm from {off"; // TODO: add 'auto', but it currently equals 'off'
@@ -1681,6 +1690,12 @@ int main(int argc, char** argv)
         }
         break;
       }
+      case OPTION_SR_MODEL:
+        sr_model_path = optarg;
+        break;
+      case OPTION_SR_DEVICE:
+        sr_device = optarg;
+        break;
     }
   }
 
@@ -2064,9 +2079,22 @@ int do_encode_images(heif_context* context, heif_encoder* encoder, heif_encoding
     // --- scale image if requested
     if (scale_width > 0 && scale_height > 0) {
       heif_image* scaled_image = nullptr;
+      heif_scaling_options* scale_opts = nullptr;
+
+      // If SR model is provided, configure super resolution
+      if (!sr_model_path.empty()) {
+        scale_opts = heif_scaling_options_alloc();
+        scale_opts->algorithm = heif_scaling_algorithm_super_resolution;
+        scale_opts->ivsr_model_path = sr_model_path.c_str();
+        scale_opts->ivsr_device = sr_device.c_str();
+      }
+
       heif_error err = heif_image_scale_image(image.get(), &scaled_image,
                                               scale_width, scale_height,
-                                              nullptr);
+                                              scale_opts);
+      if (scale_opts) {
+        heif_scaling_options_free(scale_opts);
+      }
       if (err.code) {
         std::cerr << "Could not scale image: " << err.message << "\n";
         return 1;

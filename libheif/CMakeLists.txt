@@ -343,6 +343,15 @@ if (HEIF_WITH_OMAF)
             omaf_boxes.cc)
 endif ()
 
+if (HAVE_IVSR)
+    target_compile_definitions(heif PRIVATE HAVE_IVSR=1)
+    target_sources(heif PRIVATE
+            ivsr_scaling_plugin.h
+            ivsr_scaling_plugin.cc)
+    target_include_directories(heif PRIVATE ${IVSR_INCLUDE_DIR})
+    target_link_libraries(heif PRIVATE ${IVSR_LIBRARY})
+endif ()
+
 write_basic_package_version_file(${PROJECT_NAME}-config-version.cmake COMPATIBILITY ExactVersion)
 
 install(TARGETS heif EXPORT ${PROJECT_NAME}-config
