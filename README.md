@@ -30,6 +30,7 @@ libheif has support for:
 * reading EXIF and XMP metadata
 * region annotations and mask images
 * streaming of images and video by requesting data from the network through a data-reader interface
+* AI-based super resolution upscaling via Intel iVSR SDK (optional)
 
 Supported codecs:
 | Format       |  Decoders           |  Encoders                    |
@@ -42,6 +43,31 @@ Supported codecs:
 | JPEG2000     | OpenJPEG            | OpenJPEG                     |
 | HTJ2K        | OpenJPEG            | OpenJPH                      |
 | uncompressed | built-in            | built-in                     |
+
+### AI Super Resolution (iVSR)
+
+libheif optionally supports AI-based super resolution upscaling via the [Intel iVSR SDK](https://github.com/OpenVisualCloud/iVSR).
+When enabled, images can be upscaled by exactly 2× or 4× using the Enhanced EDSR deep learning model,
+producing higher quality results than nearest-neighbor interpolation.
+
+To build with iVSR support:
+
+```sh
+cmake --preset=release .. -DWITH_IVSR=ON -DIVSR_SDK_PATH=/path/to/ivsr
+```
+
+Usage with `heif_enc`:
+
+```sh
+# 2× super resolution upscaling on CPU
+heif_enc input.heif -o output.heif --scale 1280x960 --sr-model /path/to/enhanced_edsr.xml
+
+# 4× super resolution upscaling on GPU (two sequential 2× passes)
+heif_enc input.heif -o output.heif --scale 2560x1920 --sr-model /path/to/enhanced_edsr.xml --sr-device GPU
+```
+
+When iVSR is not compiled in, or the requested scale factor is not exactly 2× or 4×,
+the scaling automatically falls back to nearest-neighbor interpolation.
 
 ## Programming API
 

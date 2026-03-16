@@ -272,13 +272,11 @@ heif_error heif_image_scale_image(const heif_image* input,
       // Dispatch to iVSR super resolution
       // For 4x: internally runs two passes of 2x SR
       return heif_image_scale_with_ivsr(input, output, width, height, options);
-#else
-      return {heif_error_Unsupported_feature, heif_suberror_Unspecified,
-              "iVSR super resolution support not compiled in"};
 #endif
+      // iVSR not compiled in — fall through to nearest-neighbor
     }
 
-    // For non-2x/4x scale factors, fall through to nearest-neighbor
+    // For non-2x/4x scale factors or iVSR not available, fall through to nearest-neighbor
   }
 
   // Default: nearest-neighbor scaling (existing behavior)

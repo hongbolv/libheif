@@ -246,13 +246,11 @@ heif_error heif_image_scale_image(const heif_image* input,
             // Dispatch to iVSR super resolution
             // For 4×: internally runs two passes of 2× SR
             return heif_image_scale_with_ivsr(input, output, width, height, options);
-#else
-            return {heif_error_Unsupported_feature, heif_suberror_Unspecified,
-                    "iVSR super resolution support not compiled in"};
 #endif
+            // iVSR not compiled in — fall through to nearest-neighbor
         }
 
-        // For non-2×/4× scale factors, use nearest-neighbor
+        // For non-2×/4× scale factors or iVSR not available, use nearest-neighbor
         // (SR models only produce exact 2× output per pass)
     }
 
@@ -1003,7 +1001,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 | Scenario | Behavior |
 |----------|----------|
 | `options == NULL` | Use nearest-neighbor (existing behavior) |
-| `algorithm == super_resolution` but `HAVE_IVSR` not defined | Return `heif_error_Unsupported_feature` |
+| `algorithm == super_resolution` but `HAVE_IVSR` not defined | Fall back to nearest-neighbor |
 | `algorithm == super_resolution` but scale is not 2× or 4× | Use nearest-neighbor (decided at dispatch) |
 | `ivsr_model_path` is NULL | Return `heif_error_Usage_error` |
 | Model file not found | Return `heif_error_Plugin_loading_error` (from iVSR init failure) |
