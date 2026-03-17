@@ -302,6 +302,25 @@ Example encoding with SVT-HEVC:
 ./heif-enc -e svt-hevc -p preset=3 -p qp=28 -o output.heic input.png
 ```
 
+**Note on the real-time scheduling warning:**
+SVT-HEVC internally attempts to set real-time thread scheduling (SCHED_FIFO) for its
+worker threads. When running without elevated privileges, the SVT-HEVC library may print:
+`SVT [WARNING] Elevated privileges required to run with real-time policies!`
+This warning is harmless — the encoder works correctly without real-time scheduling;
+only thread priority is affected. The libheif SVT-HEVC plugin sets the SVT-HEVC log
+level to 0 (silent) by default, which suppresses this warning. If you need SVT-HEVC
+diagnostic output, you can increase the logging level, in which case you can eliminate
+the warning by granting real-time scheduling permissions:
+
+```sh
+# Option 1: Set the rtprio limit for your user (requires relogin)
+# Add to /etc/security/limits.conf:
+#   <username> - rtprio 99
+
+# Option 2: Run with elevated privileges
+sudo ./heif-enc -e svt-hevc -q 80 -o output.heic input.png
+```
+
 ## Codec plugins
 
 Starting with v1.14.0, each codec backend can be compiled statically into libheif or as a dynamically loaded plugin.
