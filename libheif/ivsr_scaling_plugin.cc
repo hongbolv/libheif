@@ -123,11 +123,11 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
                                      conversion_options,
                                      nullptr,
                                      nullptr);
-    if (result.error) {
+    if (!result) {
       return {heif_error_Encoding_error, heif_suberror_Unspecified,
               "Failed to convert image to RGB for iVSR"};
     }
-    converted_image = result.value;
+    converted_image = *result;
     tensor_color_format = "RGB";
     input_ptr = converted_image->get_plane(heif_channel_interleaved, &in_stride);
   }
