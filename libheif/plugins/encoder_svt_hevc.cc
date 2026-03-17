@@ -607,6 +607,18 @@ static heif_error svt_hevc_init_encoder(encoder_struct_svt_hevc* encoder,
   config->rateControlMode = 0;  // CQP mode
   config->threadCount = encoder->threads;
 
+  // Disable CPU socket pinning since we are using SVT-HEVC as a library
+  // rather than a standalone application.
+  config->targetSocket = -1;
+
+  // Pass the configured log level to SVT-HEVC. By default (log_level=0),
+  // this suppresses SVT-HEVC's internal logging messages, including the
+  // "Elevated privileges required to run with real-time policies!" warning
+  // that SVT-HEVC emits when it fails to set SCHED_FIFO real-time thread
+  // scheduling due to insufficient permissions. The encoder still functions
+  // correctly without real-time scheduling — only thread priority is affected.
+  config->logLevel = encoder->log_level;
+
   if (image_sequence) {
     config->intraPeriodLength = encoder->intra_period;
     config->hierarchicalLevels = 3;
