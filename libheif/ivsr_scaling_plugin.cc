@@ -176,9 +176,9 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   try {
     status = ivsr_init(&configs[0], &handle);
   }
-  catch (const std::exception& e) {
+  catch (const std::exception&) {
     return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
-            e.what()};
+            "iVSR initialization threw an exception"};
   }
   if (status != OK) {
     return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
@@ -206,10 +206,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     status = ivsr_process(handle, reinterpret_cast<char*>(input_ptr),
                           reinterpret_cast<char*>(output_ptr), &cb);
   }
-  catch (const std::exception& e) {
+  catch (const std::exception&) {
     ivsr_deinit(handle);
     return {heif_error_Encoding_error, heif_suberror_Unspecified,
-            e.what()};
+            "iVSR processing threw an exception"};
   }
   if (status != OK) {
     ivsr_deinit(handle);
@@ -251,9 +251,9 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     try {
       status = ivsr_init(&configs[0], &handle);
     }
-    catch (const std::exception& e) {
+    catch (const std::exception&) {
       return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
-              e.what()};
+              "iVSR initialization threw an exception (4x second pass)"};
     }
     if (status != OK) {
       return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
@@ -273,10 +273,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
       status = ivsr_process(handle, reinterpret_cast<char*>(output_ptr),
                             reinterpret_cast<char*>(output_ptr_4x), &cb);
     }
-    catch (const std::exception& e) {
+    catch (const std::exception&) {
       ivsr_deinit(handle);
       return {heif_error_Encoding_error, heif_suberror_Unspecified,
-              e.what()};
+              "iVSR processing threw an exception (4x second pass)"};
     }
     if (status != OK) {
       ivsr_deinit(handle);
