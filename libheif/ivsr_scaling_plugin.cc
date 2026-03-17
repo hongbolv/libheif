@@ -315,20 +315,55 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     out_img = std::move(out_img_4x);
   }
 
-  // --- Step 6: Return result ---
-  // Transfer color profile from source image to output so that downstream
-  // encoding uses the correct matrix coefficients for RGB→YCbCr conversion.
-  // Without this, the encoder may use default/wrong coefficients, causing
-  // correct luminance but incorrect chrominance in the encoded output.
+  // --- Step 6: Convert output to match source colorspace/chroma ---
+  // Align iVSR output format with nearest-neighbor: nearest-neighbor preserves
+  // the source colorspace (e.g., YCbCr 4:2:0 stays YCbCr 4:2:0), so iVSR must
+  // also produce output in the same format. Without this, the encoder sees
+  // different formats depending on the scaler, causing wrong nclx profile
+  // selection and chrominance corruption.
+  std::shared_ptr<HeifPixelImage> final_img;
+  if (cs != heif_colorspace_RGB || chroma != heif_chroma_interleaved_RGB) {
+    // Source was not RGB interleaved — convert iVSR's RGB output back to the
+    // source colorspace/chroma so the encoder sees a consistent format.
+    nclx_profile output_nclx = src_image->has_nclx_color_profile()
+                               ? src_image->get_color_profile_nclx()
+                               : nclx_profile{};
+
+    heif_color_conversion_options conversion_options;
+    conversion_options.version = 1;
+    conversion_options.preferred_chroma_downsampling_algorithm = heif_chroma_downsampling_average;
+    conversion_options.preferred_chroma_upsampling_algorithm = heif_chroma_upsampling_nearest_neighbor;
+    conversion_options.only_use_preferred_chroma_algorithm = false;
+
+    auto result = convert_colorspace(out_img,
+                                     cs,
+                                     chroma,
+                                     output_nclx,
+                                     8,
+                                     conversion_options,
+                                     nullptr,
+                                     nullptr);
+    if (!result) {
+      ivsr_deinit(handle);
+      return {heif_error_Encoding_error, heif_suberror_Unspecified,
+              "Failed to convert iVSR output back to source colorspace"};
+    }
+    final_img = *result;
+  }
+  else {
+    final_img = std::move(out_img);
+  }
+
+  // Transfer color profile from source image to output.
   if (src_image->has_nclx_color_profile()) {
-    out_img->set_color_profile_nclx(src_image->get_color_profile_nclx());
+    final_img->set_color_profile_nclx(src_image->get_color_profile_nclx());
   }
   if (src_image->has_icc_color_profile()) {
-    out_img->set_color_profile_icc(src_image->get_color_profile_icc());
+    final_img->set_color_profile_icc(src_image->get_color_profile_icc());
   }
 
   *output = new heif_image;
-  (*output)->image = std::move(out_img);
+  (*output)->image = std::move(final_img);
 
   // --- Step 7: Cleanup ---
   ivsr_deinit(handle);
