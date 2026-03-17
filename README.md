@@ -43,33 +43,6 @@ Supported codecs:
 | HTJ2K        | OpenJPEG            | OpenJPH                      |
 | uncompressed | built-in            | built-in                     |
 
-### AI Super Resolution (iVSR)
-
-* AI-based super resolution upscaling via Intel iVSR SDK (optional)
-
-libheif optionally supports AI-based super resolution upscaling via the [Intel iVSR SDK](https://github.com/OpenVisualCloud/iVSR).
-When enabled, images can be upscaled by exactly 2× or 4× using the Enhanced EDSR deep learning model,
-producing higher quality results than nearest-neighbor interpolation.
-
-To build with iVSR support:
-
-```sh
-cmake --preset=release .. -DWITH_IVSR=ON -DIVSR_SDK_PATH=/path/to/ivsr
-```
-
-Usage with `heif_enc`:
-
-```sh
-# JPEG → 2× iVSR super resolution → SVT-HEVC encoding pipeline
-heif_enc input.jpg -o output.heif --hevc --scale 1280x960 --sr-model /path/to/enhanced_edsr.xml
-
-# 4× super resolution upscaling on GPU (two sequential 2× passes)
-heif_enc input.jpg -o output.heif --hevc --scale 2560x1920 --sr-model /path/to/enhanced_edsr.xml --sr-device GPU
-```
-
-When iVSR is not compiled in, or the requested scale factor is not exactly 2× or 4×,
-the scaling automatically falls back to nearest-neighbor interpolation.
-
 ## Programming API
 
 The library has a C API for easy integration and wide language support.
@@ -328,6 +301,31 @@ Example encoding with SVT-HEVC:
 ./heif-enc -e svt-hevc -q 80 -o output.heic input.png
 ./heif-enc -e svt-hevc -p preset=3 -p qp=28 -o output.heic input.png
 ```
+
+### Adding AI Super Resolution (iVSR)
+
+libheif optionally supports AI-based super resolution upscaling via the [Intel iVSR SDK](https://github.com/OpenVisualCloud/iVSR).
+When enabled, images can be upscaled by exactly 2× or 4× using the Enhanced EDSR deep learning model,
+producing higher quality results than nearest-neighbor interpolation.
+
+To build with iVSR support:
+
+```sh
+cmake --preset=release .. -DWITH_IVSR=ON -DIVSR_SDK_PATH=/path/to/ivsr
+```
+
+Usage with `heif_enc`:
+
+```sh
+# JPEG → 2× iVSR super resolution → SVT-HEVC encoding pipeline
+heif_enc input.jpg -o output.heif --hevc --scale 1280x960 --sr-model /path/to/enhanced_edsr.xml
+
+# 4× super resolution upscaling on GPU (two sequential 2× passes)
+heif_enc input.jpg -o output.heif --hevc --scale 2560x1920 --sr-model /path/to/enhanced_edsr.xml --sr-device GPU
+```
+
+When iVSR is not compiled in, or the requested scale factor is not exactly 2× or 4×,
+the scaling automatically falls back to nearest-neighbor interpolation.
 
 ## Codec plugins
 
