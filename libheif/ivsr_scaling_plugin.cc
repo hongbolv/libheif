@@ -28,6 +28,7 @@
 #include <vector>
 #include <cstring>
 #include <string>
+#include <stdexcept>
 
 
 // Callback for iVSR synchronous processing
@@ -62,53 +63,25 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   // The dispatcher guarantees target is exactly 2x or 4x of source
   int num_passes = (target_width == src_width * 4) ? 2 : 1;
 
-  // --- Step 1: Prepare input - select best conversion path ---
-  // Format conversion selection logic:
-  //   1. RGB, BGR interleaved -> OpenVINO prepostProcessor handles directly (zero-copy)
-  //   2. HEIF YCbCr 4:2:0 planar -> pass Y/Cb/Cr plane pointers directly via
-  //      I420_THREE_PLANES (zero-copy), OpenVINO prepostProcessor converts I420->RGB
-  //   3. All other formats (HEIF YCbCr 4:2:2/4:4:4, GRAY, 16-bit HDR)
-  //      -> fall back to libheif convert_colorspace() to RGB interleaved
+  // --- Step 1: Prepare input as RGB interleaved ---
+  // The iVSR process API accepts a single char* input pointer, so the input
+  // must be a single contiguous RGB interleaved buffer. For images already in
+  // RGB interleaved format, use them directly (zero-copy). For all other
+  // formats (YCbCr 4:2:0, 4:2:2, 4:4:4, monochrome, HDR, etc.), convert to
+  // RGB interleaved using libheif's convert_colorspace().
   std::shared_ptr<HeifPixelImage> converted_image;
-  const char* tensor_color_format = nullptr;
   size_t in_stride = 0;
   uint8_t* input_ptr = nullptr;
-  // For I420_THREE_PLANES: separate Cb/Cr plane pointers
-  uint8_t* cb_plane_ptr = nullptr;
-  size_t cb_stride = 0;
-  uint8_t* cr_plane_ptr = nullptr;
-  size_t cr_stride = 0;
 
   heif_colorspace cs = src_image->get_colorspace();
   heif_chroma chroma = src_image->get_chroma_format();
 
   if (cs == heif_colorspace_RGB && chroma == heif_chroma_interleaved_RGB) {
-    // OpenVINO: RGB interleaved - zero-copy, no conversion needed
-    tensor_color_format = "RGB";
+    // RGB interleaved - zero-copy, no conversion needed
     input_ptr = src_image->get_plane(heif_channel_interleaved, &in_stride);
   }
-  else if (cs == heif_colorspace_YCbCr && chroma == heif_chroma_420) {
-    // OpenVINO I420_THREE_PLANES path: HEIF YCbCr 4:2:0 planar has the same pixel
-    // data as I420. HeifPixelImage stores Y/Cb/Cr as separate allocations, which
-    // maps directly to OpenVINO's I420_THREE_PLANES mode (three separate tensors).
-    // This is true zero-copy - no buffer assembly needed. OpenVINO's prepostProcessor
-    // handles the I420->RGB color conversion (SIMD-optimized, potentially GPU-accelerated).
-    //
-    // Note: The iVSR API passes plane pointers through tensor descriptors.
-    // cb_plane_ptr and cr_plane_ptr are stored for use in the tensor configuration.
-    input_ptr = src_image->get_plane(heif_channel_Y, &in_stride);
-    cb_plane_ptr = src_image->get_plane(heif_channel_Cb, &cb_stride);
-    cr_plane_ptr = src_image->get_plane(heif_channel_Cr, &cr_stride);
-    if (!input_ptr || !cb_plane_ptr || !cr_plane_ptr) {
-      return {heif_error_Encoding_error, heif_suberror_Unspecified,
-              "Failed to get YCbCr planes for iVSR"};
-    }
-    tensor_color_format = "I420_THREE_PLANES";
-  }
   else {
-    // libheif fallback: HEIF YCbCr 4:2:2/4:4:4 planar, monochrome,
-    // 16-bit HDR, or other formats OpenVINO cannot handle directly.
-    // Convert to RGB interleaved using libheif's convert_colorspace().
+    // Convert any non-RGB format to RGB interleaved using libheif.
     heif_color_conversion_options conversion_options;
     conversion_options.version = 1;
     conversion_options.preferred_chroma_downsampling_algorithm = heif_chroma_downsampling_nearest_neighbor;
@@ -128,7 +101,6 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
               "Failed to convert image to RGB for iVSR"};
     }
     converted_image = *result;
-    tensor_color_format = "RGB";
     input_ptr = converted_image->get_plane(heif_channel_interleaved, &in_stride);
   }
 
@@ -166,11 +138,12 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   add_config(INPUT_RES, input_res.c_str());
 
   // Configure tensor descriptors for Enhanced EDSR fp32 model.
+  // Input is always RGB interleaved u8 (conversion done above).
   tensor_desc_t input_tensor_desc;
   std::memset(&input_tensor_desc, 0, sizeof(input_tensor_desc));
   std::strncpy(input_tensor_desc.precision, "u8", sizeof(input_tensor_desc.precision) - 1);
   std::strncpy(input_tensor_desc.layout, "NHWC", sizeof(input_tensor_desc.layout) - 1);
-  std::strncpy(input_tensor_desc.tensor_color_format, tensor_color_format, sizeof(input_tensor_desc.tensor_color_format) - 1);
+  std::strncpy(input_tensor_desc.tensor_color_format, "RGB", sizeof(input_tensor_desc.tensor_color_format) - 1);
   std::strncpy(input_tensor_desc.model_color_format, "RGB", sizeof(input_tensor_desc.model_color_format) - 1);
   input_tensor_desc.scale = normalize_factor;
   input_tensor_desc.dimension = 4;
@@ -198,7 +171,15 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 
   // --- Step 3: Initialize iVSR ---
   ivsr_handle handle = nullptr;
-  IVSRStatus status = ivsr_init(&configs[0], &handle);
+  IVSRStatus status;
+
+  try {
+    status = ivsr_init(&configs[0], &handle);
+  }
+  catch (const std::exception& e) {
+    return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
+            e.what()};
+  }
   if (status != OK) {
     return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
             "Failed to initialize iVSR engine"};
@@ -221,8 +202,15 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   cb.args = &completion_flag;
 
   // Pass input plane pointer and output plane pointer directly to iVSR.
-  status = ivsr_process(handle, reinterpret_cast<char*>(input_ptr),
-                        reinterpret_cast<char*>(output_ptr), &cb);
+  try {
+    status = ivsr_process(handle, reinterpret_cast<char*>(input_ptr),
+                          reinterpret_cast<char*>(output_ptr), &cb);
+  }
+  catch (const std::exception& e) {
+    ivsr_deinit(handle);
+    return {heif_error_Encoding_error, heif_suberror_Unspecified,
+            e.what()};
+  }
   if (status != OK) {
     ivsr_deinit(handle);
     return {heif_error_Encoding_error, heif_suberror_Unspecified,
@@ -260,7 +248,13 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     add_config(OUTPUT_TENSOR_DESC_SETTING, &output_tensor_desc);
     link_configs();
 
-    status = ivsr_init(&configs[0], &handle);
+    try {
+      status = ivsr_init(&configs[0], &handle);
+    }
+    catch (const std::exception& e) {
+      return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
+              e.what()};
+    }
     if (status != OK) {
       return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
               "Failed to initialize iVSR engine for 4x second pass"};
@@ -275,8 +269,15 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     uint8_t* output_ptr_4x = out_img_4x->get_plane(heif_channel_interleaved, &out_stride_4x);
 
     completion_flag = 0;
-    status = ivsr_process(handle, reinterpret_cast<char*>(output_ptr),
-                          reinterpret_cast<char*>(output_ptr_4x), &cb);
+    try {
+      status = ivsr_process(handle, reinterpret_cast<char*>(output_ptr),
+                            reinterpret_cast<char*>(output_ptr_4x), &cb);
+    }
+    catch (const std::exception& e) {
+      ivsr_deinit(handle);
+      return {heif_error_Encoding_error, heif_suberror_Unspecified,
+              e.what()};
+    }
     if (status != OK) {
       ivsr_deinit(handle);
       return {heif_error_Encoding_error, heif_suberror_Unspecified,
