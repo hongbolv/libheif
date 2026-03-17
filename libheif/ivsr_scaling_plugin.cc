@@ -163,10 +163,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   // Configure tensor descriptors for Enhanced EDSR fp32 model.
   tensor_desc_t input_tensor_desc;
   std::memset(&input_tensor_desc, 0, sizeof(input_tensor_desc));
-  input_tensor_desc.precision = "u8";
-  input_tensor_desc.layout = "NHWC";
-  input_tensor_desc.tensor_color_format = tensor_color_format;
-  input_tensor_desc.model_color_format = "RGB";
+  std::strncpy(input_tensor_desc.precision, "u8", sizeof(input_tensor_desc.precision) - 1);
+  std::strncpy(input_tensor_desc.layout, "NHWC", sizeof(input_tensor_desc.layout) - 1);
+  std::strncpy(input_tensor_desc.tensor_color_format, tensor_color_format, sizeof(input_tensor_desc.tensor_color_format) - 1);
+  std::strncpy(input_tensor_desc.model_color_format, "RGB", sizeof(input_tensor_desc.model_color_format) - 1);
   input_tensor_desc.scale = normalize_factor;
   input_tensor_desc.dimension = 4;
   input_tensor_desc.shape[0] = 1;
@@ -176,10 +176,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 
   tensor_desc_t output_tensor_desc;
   std::memset(&output_tensor_desc, 0, sizeof(output_tensor_desc));
-  output_tensor_desc.precision = "u8";
-  output_tensor_desc.layout = "NHWC";
-  output_tensor_desc.tensor_color_format = "RGB";
-  output_tensor_desc.model_color_format = "RGB";
+  std::strncpy(output_tensor_desc.precision, "u8", sizeof(output_tensor_desc.precision) - 1);
+  std::strncpy(output_tensor_desc.layout, "NHWC", sizeof(output_tensor_desc.layout) - 1);
+  std::strncpy(output_tensor_desc.tensor_color_format, "RGB", sizeof(output_tensor_desc.tensor_color_format) - 1);
+  std::strncpy(output_tensor_desc.model_color_format, "RGB", sizeof(output_tensor_desc.model_color_format) - 1);
   output_tensor_desc.scale = normalize_factor;
   output_tensor_desc.dimension = 4;
   output_tensor_desc.shape[0] = 1;
@@ -249,7 +249,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     std::string pass2_res = std::to_string(pass2_src_w) + "," + std::to_string(pass2_src_h);
     add_config(INPUT_RES, pass2_res.c_str());
     // Second pass always takes RGB from first pass output
-    input_tensor_desc.tensor_color_format = "RGB";
+    std::strncpy(input_tensor_desc.tensor_color_format, "RGB", sizeof(input_tensor_desc.tensor_color_format) - 1);
     add_config(INPUT_TENSOR_DESC_SETTING, &input_tensor_desc);
     add_config(OUTPUT_TENSOR_DESC_SETTING, &output_tensor_desc);
 
