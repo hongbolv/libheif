@@ -314,14 +314,14 @@ To build with iVSR support:
 cmake --preset=release .. -DWITH_IVSR=ON -DIVSR_SDK_PATH=/path/to/ivsr
 ```
 
-Usage with `heif_enc`:
+Usage with `heif-enc`:
 
 ```sh
 # JPEG → 2× iVSR super resolution → SVT-HEVC encoding pipeline
-heif_enc input.jpg -o output.heif --hevc --scale 1280x960 --sr-model /path/to/enhanced_edsr.xml
+./heif-enc input.jpg -o output.heif --hevc --scale 1280x960 --sr-model /path/to/enhanced_edsr.xml
 
 # 4× super resolution upscaling on GPU (two sequential 2× passes)
-heif_enc input.jpg -o output.heif --hevc --scale 2560x1920 --sr-model /path/to/enhanced_edsr.xml --sr-device GPU
+./heif-enc input.jpg -o output.heif --hevc --scale 2560x1920 --sr-model /path/to/enhanced_edsr.xml --sr-device GPU
 ```
 
 When iVSR is not compiled in, or the requested scale factor is not exactly 2× or 4×,
