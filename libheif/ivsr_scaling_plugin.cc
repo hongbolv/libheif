@@ -28,7 +28,7 @@
 #include <vector>
 #include <cstring>
 #include <string>
-#include <stdexcept>
+#include <iostream>
 
 
 // Callback for iVSR synchronous processing
@@ -69,6 +69,13 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   // RGB interleaved format, use them directly (zero-copy). For all other
   // formats (YCbCr 4:2:0, 4:2:2, 4:4:4, monochrome, HDR, etc.), convert to
   // RGB interleaved using libheif's convert_colorspace().
+  //
+  // Note: The I420_THREE_PLANES path was removed because:
+  //   1. The iVSR SDK map uses "I420_Three_Planes" (mixed case) but our code
+  //      passed "I420_THREE_PLANES" (all caps), causing map::at to throw
+  //      std::out_of_range in ov_engine::init_impl().
+  //   2. ivsr_process() only accepts a single char* pointer, but I420 three
+  //      planes requires passing three separate plane pointers (Y, Cb, Cr).
   std::shared_ptr<HeifPixelImage> converted_image;
   size_t in_stride = 0;
   uint8_t* input_ptr = nullptr;
@@ -81,7 +88,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     input_ptr = src_image->get_plane(heif_channel_interleaved, &in_stride);
   }
   else {
-    // Convert any non-RGB format to RGB interleaved using libheif.
+    // Convert any non-RGB format to RGB interleaved.
     heif_color_conversion_options conversion_options;
     conversion_options.version = 1;
     conversion_options.preferred_chroma_downsampling_algorithm = heif_chroma_downsampling_nearest_neighbor;
@@ -172,11 +179,15 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   // --- Step 3: Initialize iVSR ---
   ivsr_handle handle = nullptr;
   IVSRStatus status;
-
   try {
     status = ivsr_init(&configs[0], &handle);
   }
-  catch (const std::exception&) {
+  catch (const std::exception& e) {
+    std::cerr << "iVSR initialization exception: " << e.what() << std::endl;
+    return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
+            "iVSR initialization threw an exception"};
+  }
+  catch (...) {
     return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
             "iVSR initialization threw an exception"};
   }
@@ -206,7 +217,13 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     status = ivsr_process(handle, reinterpret_cast<char*>(input_ptr),
                           reinterpret_cast<char*>(output_ptr), &cb);
   }
-  catch (const std::exception&) {
+  catch (const std::exception& e) {
+    std::cerr << "iVSR processing exception: " << e.what() << std::endl;
+    ivsr_deinit(handle);
+    return {heif_error_Encoding_error, heif_suberror_Unspecified,
+            "iVSR processing threw an exception"};
+  }
+  catch (...) {
     ivsr_deinit(handle);
     return {heif_error_Encoding_error, heif_suberror_Unspecified,
             "iVSR processing threw an exception"};
@@ -251,9 +268,14 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     try {
       status = ivsr_init(&configs[0], &handle);
     }
-    catch (const std::exception&) {
+    catch (const std::exception& e) {
+      std::cerr << "iVSR 4x second pass init exception: " << e.what() << std::endl;
       return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
-              "iVSR initialization threw an exception (4x second pass)"};
+              "iVSR 4x second pass initialization threw an exception"};
+    }
+    catch (...) {
+      return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
+              "iVSR 4x second pass initialization threw an exception"};
     }
     if (status != OK) {
       return {heif_error_Plugin_loading_error, heif_suberror_Unspecified,
@@ -273,10 +295,16 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
       status = ivsr_process(handle, reinterpret_cast<char*>(output_ptr),
                             reinterpret_cast<char*>(output_ptr_4x), &cb);
     }
-    catch (const std::exception&) {
+    catch (const std::exception& e) {
+      std::cerr << "iVSR 4x second pass processing exception: " << e.what() << std::endl;
       ivsr_deinit(handle);
       return {heif_error_Encoding_error, heif_suberror_Unspecified,
-              "iVSR processing threw an exception (4x second pass)"};
+              "iVSR 4x second pass processing threw an exception"};
+    }
+    catch (...) {
+      ivsr_deinit(handle);
+      return {heif_error_Encoding_error, heif_suberror_Unspecified,
+              "iVSR 4x second pass processing threw an exception"};
     }
     if (status != OK) {
       ivsr_deinit(handle);
@@ -288,6 +316,17 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   }
 
   // --- Step 6: Return result ---
+  // Transfer color profile from source image to output so that downstream
+  // encoding uses the correct matrix coefficients for RGB→YCbCr conversion.
+  // Without this, the encoder may use default/wrong coefficients, causing
+  // correct luminance but incorrect chrominance in the encoded output.
+  if (src_image->has_nclx_color_profile()) {
+    out_img->set_color_profile_nclx(src_image->get_color_profile_nclx());
+  }
+  if (src_image->has_icc_color_profile()) {
+    out_img->set_color_profile_icc(src_image->get_color_profile_icc());
+  }
+
   *output = new heif_image;
   (*output)->image = std::move(out_img);
 
