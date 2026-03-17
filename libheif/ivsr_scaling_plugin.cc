@@ -138,6 +138,9 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   }
 
   // --- Step 2: Build iVSR configuration linked list ---
+  // Note: the linked list `next` pointers must be set AFTER all configs are
+  // added to the vector. Setting them inside push_back causes dangling pointers
+  // when the vector reallocates its internal buffer.
   std::vector<ivsr_config_t> configs;
   auto add_config = [&configs](IVSRConfigKey key, const void* value) {
     ivsr_config_t cfg;
@@ -145,8 +148,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     cfg.value = value;
     cfg.next = nullptr;
     configs.push_back(cfg);
-    if (configs.size() > 1) {
-      configs[configs.size() - 2].next = &configs.back();
+  };
+  auto link_configs = [&configs]() {
+    for (size_t i = 0; i + 1 < configs.size(); i++) {
+      configs[i].next = &configs[i + 1];
     }
   };
 
@@ -189,6 +194,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
 
   add_config(INPUT_TENSOR_DESC_SETTING, &input_tensor_desc);
   add_config(OUTPUT_TENSOR_DESC_SETTING, &output_tensor_desc);
+  link_configs();
 
   // --- Step 3: Initialize iVSR ---
   ivsr_handle handle = nullptr;
@@ -252,6 +258,7 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     std::strncpy(input_tensor_desc.tensor_color_format, "RGB", sizeof(input_tensor_desc.tensor_color_format) - 1);
     add_config(INPUT_TENSOR_DESC_SETTING, &input_tensor_desc);
     add_config(OUTPUT_TENSOR_DESC_SETTING, &output_tensor_desc);
+    link_configs();
 
     status = ivsr_init(&configs[0], &handle);
     if (status != OK) {
