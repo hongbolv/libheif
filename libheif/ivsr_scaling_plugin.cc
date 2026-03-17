@@ -29,6 +29,45 @@
 #include <cstring>
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <cerrno>
+
+
+// Debug helper: dump an RGB interleaved image to a PPM file for visual inspection.
+// Enabled by setting environment variable HEIF_DEBUG_IVSR=1.
+// Dumps are written to the current working directory.
+static void dump_debug_image(const uint8_t* rgb_data, int width, int height,
+                             size_t stride, const char* filename)
+{
+  const char* env = std::getenv("HEIF_DEBUG_IVSR");
+  if (!env || env[0] == '\0' || env[0] == '0') {
+    return;
+  }
+
+  std::ofstream ofs(filename, std::ios::binary);
+  if (!ofs) {
+    std::cerr << "[iVSR debug] Failed to open " << filename
+              << " for writing: " << std::strerror(errno) << "\n";
+    return;
+  }
+
+  // PPM header (binary RGB format)
+  ofs << "P6\n" << width << " " << height << "\n255\n";
+
+  for (int y = 0; y < height; y++) {
+    ofs.write(reinterpret_cast<const char*>(rgb_data + y * stride),
+              width * 3);
+  }
+
+  if (!ofs) {
+    std::cerr << "[iVSR debug] Write error for " << filename << "\n";
+    return;
+  }
+
+  std::cerr << "[iVSR debug] Dumped " << width << "x" << height
+            << " RGB image to " << filename << "\n";
+}
 
 
 // Callback for iVSR synchronous processing
@@ -212,6 +251,9 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
   cb.ivsr_cb = ivsr_completion_callback;
   cb.args = &completion_flag;
 
+  // Debug: dump iVSR input image
+  dump_debug_image(input_ptr, src_width, src_height, in_stride, "ivsr_debug_input.ppm");
+
   // Pass input plane pointer and output plane pointer directly to iVSR.
   try {
     status = ivsr_process(handle, reinterpret_cast<char*>(input_ptr),
@@ -233,6 +275,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
     return {heif_error_Encoding_error, heif_suberror_Unspecified,
             "iVSR processing failed"};
   }
+
+  // Debug: dump iVSR output image (first pass / 2x result)
+  dump_debug_image(output_ptr, sr_width, sr_height, out_stride,
+                   num_passes == 2 ? "ivsr_debug_output_pass1.ppm" : "ivsr_debug_output.ppm");
 
   // --- Step 5: Handle 4x (second pass) ---
   if (num_passes == 2) {
@@ -311,6 +357,10 @@ heif_error heif_image_scale_with_ivsr(const heif_image* input,
       return {heif_error_Encoding_error, heif_suberror_Unspecified,
               "iVSR 4x second pass processing failed"};
     }
+
+    // Debug: dump iVSR 4x output image (second pass)
+    dump_debug_image(output_ptr_4x, pass2_out_w, pass2_out_h, out_stride_4x,
+                     "ivsr_debug_output.ppm");
 
     out_img = std::move(out_img_4x);
   }
